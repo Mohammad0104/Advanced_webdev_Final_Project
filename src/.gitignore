@@ -1,0 +1,70 @@
+*.zip
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Virtual environment
+venv/
+.env/
+.venv/
+
+# Flask/Django stuff:
+instance/
+*.sqlite3
+*.db
+*.sqlite
+
+# Environment variables files
+.env
+.env.*
+
+# Logs
+*.log
+*.out
+*.err
+logs/
+*.log
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+
+# Unit test / pytest
+.cache/
+.tox/
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+.pyre/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# macOS-specific files
+.DS_Store
+
+# Editor directories and files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# PyCharm
+*.iml
+*.ipr
+*.iws
+
+# Generated files from builds
+build/
+dist/
+*.egg-info/
