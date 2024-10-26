@@ -1,7 +1,7 @@
 # Advanced Web Dev Final Project
 
 ## Instructions:
-- Create virtual environment (windows):
+- Create virtual environment (windows command line):
   - `python -m venv .venv`
 - Run virtual environment:
   - `.venv\Scripts\activate`
