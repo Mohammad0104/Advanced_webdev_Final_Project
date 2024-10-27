@@ -1,1 +1,15 @@
-# Advance_webdev_Final_Project
+# Advanced Web Dev Final Project
+
+## Instructions:
+- Create virtual environment (windows command line):
+  - `python -m venv .venv`
+- Run virtual environment:
+  - `.venv\Scripts\activate`
+- Install dependencies:
+  - `pip install -r requirements.txt`
+- Add the necessary .env files
+- Run app:
+  - `python src/app.py`
+
+## Notes:
+- For now this will only work with manually added test emails
