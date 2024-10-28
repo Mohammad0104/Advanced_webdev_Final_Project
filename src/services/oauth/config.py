@@ -9,6 +9,11 @@ class Config:
   AUTHORIZATION_BASE_URL = 'https://accounts.google.com/o/oauth2/auth'
   TOKEN_URL = 'https://oauth2.googleapis.com/token'
   USER_API_URL = 'https://www.googleapis.com/oauth2/v1/userinfo'
-  REDIRECT_URI = 'http://localhost:5000/callback'
-  SCOPE = "openid%20email%20profile"
+  REDIRECT_URI = 'https://localhost:5000/callback'
+  # SCOPE = "openid%20email%20profile"
+  SCOPE = [
+    'openid',
+    'email',
+    'profile'
+  ]
   RESPONSE_TYPE = "code"
