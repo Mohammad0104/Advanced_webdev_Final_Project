@@ -7,4 +7,3 @@ class User(db.Model):
     successful_sales = db.Column(db.Integer, default=0, nullable=False)
     profile_pic_url = db.Column(db.String(255), nullable=False)
     admin = db.Column(db.Boolean, nullable=False)
-    

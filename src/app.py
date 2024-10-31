@@ -7,16 +7,21 @@ from controllers.oauth_controller import oauth_bp
 
 def create_app():
   app = Flask(__name__)
+  app.config.from_object(Config)
   
   # Talisman(app, force_https=True)
   
   # Initialize extensions
-  # db.init_app(app)
+  db.init_app(app)
   
   app.secret_key = Config.SECRET_KEY
   
   # Register blueprints
   app.register_blueprint(oauth_bp)
+  
+  with app.app_context():
+    if not app.config.get('TESTING', False):
+      db.create_all()
     
   return app
 
