@@ -33,7 +33,7 @@ class OAuthService:
         information from the client secret file and scopes
         """
         self.flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
-        self.CLIENT_SECRETS_FILE, scopes=self.SCOPES
+            self.CLIENT_SECRETS_FILE, scopes=self.SCOPES
         )
         
         # setting the URI where Google will send the user back to after
