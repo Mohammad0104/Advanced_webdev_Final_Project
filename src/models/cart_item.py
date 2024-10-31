@@ -7,4 +7,4 @@ class CartItem(db.Model):
     quantity = db.Column(db.Integer, default=1, nullable=False)
     
     cart = db.relationship('Cart', backref='items')
-    product = db.relationship('Product', backref='cart_items')
+    product = db.relationship('Product')

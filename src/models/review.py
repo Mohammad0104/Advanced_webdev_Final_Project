@@ -8,5 +8,8 @@ class Review(db.Model):
     explanation = db.Column(db.String(300))
     review_date = db.Column(db.Date, nullable=False)
     
+    # relationship to the user who wrote the review
     reviewing_user = db.relationship('User', backref='reviews')
+    
+    # relationship to the product being reviewed
     reviewed_product = db.relationship('Product', backref='reviews')
