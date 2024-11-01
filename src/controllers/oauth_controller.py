@@ -27,8 +27,6 @@ def authorize():
     authorization_url, state = oauth_service.get_authorization_url()
     session['state'] = state  # Store state for verification
     
-    # print("Authorization URL:", authorization_url)
-    # print("Scopes being used:", oauth_service.SCOPES)
     return redirect(authorization_url)
 
 @oauth_bp.route('/oauth2callback')

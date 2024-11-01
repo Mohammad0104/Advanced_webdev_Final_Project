@@ -80,21 +80,6 @@ class OAuthService:
         )
         
         return authorization_url, state
-
-    # def get_granted_scopes(self, authorization_response):
-    #   # This method should extract and return the granted scopes from the authorization response.
-    #   # The implementation depends on the format of the response; you may need to parse the URL or the response body.
-    #   # Example: if the response includes the scopes in the URL parameters:
-        
-    #   from urllib.parse import urlparse, parse_qs
-
-    #   parsed_response = urlparse(authorization_response)
-    #   scopes = parse_qs(parsed_response.query).get('scope', [])
-        
-    #   # Split the scopes string into a list if multiple scopes are granted
-    #   granted_scopes = [scope.strip() for scope in scopes[0].split(',')] if scopes else []
-        
-    #   return granted_scopes
     
     def fetch_token(self, authorization_response):
         """Fetches the credetials after authentication.
@@ -108,9 +93,6 @@ class OAuthService:
             google.oauth2.credentials.Credentials: Instance/object containing access and refresh tokens, 
             token expiration time, and granted scopes
         """
-        # print("\n\n\nYOOO")
-        # print(authorization_response)
-        # print("\n\n\n")
         
         self.flow.fetch_token(authorization_response=authorization_response)
         return self.flow.credentials
