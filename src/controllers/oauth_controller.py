@@ -1,8 +1,13 @@
 from flask import Blueprint, redirect, request, session, jsonify
+from services.auth import login_required
 from services.oauth.oauth_service import OAuthService
 import requests
 import google.oauth2.credentials
 
+# user service
+from services import user_service
+
+# oauth service
 oauth_bp = Blueprint('oauth_bp', __name__)
 oauth_service = OAuthService()
 
@@ -11,9 +16,10 @@ def index():
     # options table (will be changed later.  For now the focus is on "Test the authentication flow directly")
     return print_index_table()
 
+# log in page
 @oauth_bp.route('/authorize')
 def authorize():
-    """Starts the OAuth 2.0 authorization flow 
+    """Starts the OAuth 2.0 authorization flow (the login page)
 
     Returns:
         Redirect user to the authorization URL
@@ -34,10 +40,6 @@ def oauth2callback():
     """
     state = session['state']  # retrieve the state to verify
     authorization_response = request.url # get full callback URL
-    
-    # print("\n\nHEYYYY")
-    # print(authorization_response)
-    # print("\n\n")
 
     # fetch credentials
     credentials = oauth_service.fetch_token(authorization_response)
@@ -47,31 +49,29 @@ def oauth2callback():
     
     # store the credentials in the session
     session['credentials'] = OAuthService.credentials_to_dict(credentials)
+    
+    # get user info
+    user_info = oauth_service.get_user_info(credentials.token)
 
-    # return redirect('/test')
+    # add user to db if not already in
+    if user_info:
+        user = user_service.get_user_by_email(user_info.get('email'))
+        if not user:
+            user_service.create_user(
+                name = user_info.get('name'),
+                email = user_info.get('email'),
+                profile_pic_url = user_info.get('picture')
+            )
+        
+        # add the id to the session (will be used for @login_required)
+        session['user_id'] = user.id
+
+    # redirect to the user_info endpoint
     return redirect('/user_info')
 
-# @oauth_bp.route('/test')
-# def test_api_request():
-#     if not oauth_service.has_drive_scope(credentials):
-#         print("Google Drive scope not granted. Skipping Drive operations.")
-#         return  # or handle as needed
-    
-#     if 'credentials' not in session:
-#         return redirect('/authorize')
-
-#     credentials = google.oauth2.credentials.Credentials(
-#         **session['credentials']
-#     )
-
-#     drive_service = oauth_service.get_drive_service(credentials)
-#     files = drive_service.files().list().execute()
-
-#     session['credentials'] = OAuthService.credentials_to_dict(credentials)  # Refresh credentials if necessary
-
-#     return jsonify(**files)
 
 @oauth_bp.route('/user_info')
+@login_required
 def user_info():
     """Get and display user information.  To be used after authentication
 

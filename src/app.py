@@ -1,6 +1,6 @@
 from flask import Flask
 from models import db
-from config import Config
+from config.config import Config
 import os
 from controllers.oauth_controller import oauth_bp
 # from flask_talisman import Talisman
