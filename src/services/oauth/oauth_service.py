@@ -6,10 +6,8 @@ import requests
 from .config import Config
 
 class OAuthService:
-    base_dir = os.path.dirname(os.path.abspath(__file__))  # Directory of the current file
-    CLIENT_SECRETS_FILE = os.path.join(base_dir, 'client_secret.json')  # Full path to client_secret.json
-    # CLIENT_SECRETS_FILE = "client_secret.json"
-    # SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly']
+    base_dir = os.path.dirname(os.path.abspath(__file__))  # directory of the current file
+    CLIENT_SECRETS_FILE = os.path.join(base_dir, 'client_secret.json')  # full path to client_secret.json
     
     # starting scopes (permissions)
     SCOPES = [
