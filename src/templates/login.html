@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< Updated upstream
     <title>Home</title>
     <link rel="stylesheet" href="/static/css/styles.css">
 </head>
@@ -38,5 +39,22 @@
     <footer>
         <p>Copyright © 2024</p>
     </footer>
+=======
+    <title>Login with Google</title>
+    <link rel="stylesheet" href="/static/style.css"> <!-- Optional CSS file for styling -->
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login with Google</h2>
+        <button id="google-login" onclick="googleLogin()">Sign in with Google</button>
+    </div>
+
+    <script>
+        function googleLogin() {
+            // Redirect to Google's OAuth 2.0 server
+            window.location.href = '/login/google';
+        }
+    </script>
+>>>>>>> Stashed changes
 </body>
 </html>
