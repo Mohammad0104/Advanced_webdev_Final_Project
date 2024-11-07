@@ -1,4 +1,7 @@
 from . import db
+from .review import Review
+from .cart_item import CartItem
+
 
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -19,6 +22,34 @@ class Product(db.Model):
     avg_rating = db.Column(db.Float)
     
     seller = db.relationship('User', backref='products') 
-    reviews = db.relationship('Review', backref='reviewed_product')
-    cart_items = db.relationship('CartItem', backref='product')
+    
+    # reviews = db.relationship('Review', backref='reviewed_product')
+    reviews = db.relationship('Review', back_populates='reviewed_product')
+    
+    # cart_items = db.relationship('CartItem', backref='product')
+    cart_items = db.relationship('CartItem', back_populates='product')
+    
+    
+    def to_dict(self):
+        # Extract relevant data for the product dictionary
+        product_dict = {
+            'id': self.id,
+            'seller_id': self.seller_id,
+            'description': self.description,
+            'price': self.price,
+            'gender': self.gender,
+            'size': self.size,
+            'youth_size': self.youth_size,
+            'featured': self.featured,
+            'brand': self.brand,
+            'sport': self.sport,
+            'quantity': self.quantity,
+            'condition': self.condition,
+            'image_url': self.image_url,
+            'date_listed': self.date_listed,
+            'year_product_made': self.year_product_made,
+            'avg_rating': self.avg_rating,
+        }
+
+        return product_dict
     

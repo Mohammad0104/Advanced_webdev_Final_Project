@@ -12,4 +12,6 @@ class Review(db.Model):
     reviewing_user = db.relationship('User', backref='reviews')
     
     # relationship to the product being reviewed
-    reviewed_product = db.relationship('Product', backref='reviews')
+    # reviewed_product = db.relationship('Product', backref='reviews')
+    # reviewed_product = db.relationship('Product', back_populates='product_reviews')
+    reviewed_product = db.relationship('Product', back_populates='reviews')

@@ -26,8 +26,8 @@ def create_product(seller_id: int,
     sport: str, 
     quantity: int, 
     condition: str, 
-    image_url: str,
-    date_listed: datetime, 
+    image_url: str, 
+    date_listed: datetime,
     year_product_made: Optional[str], 
     avg_rating: float) -> Optional[Product]:
     """Create a new product in the db

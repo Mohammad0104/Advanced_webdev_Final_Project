@@ -1,4 +1,5 @@
 from . import db
+from .cart import Cart
 
 class CartItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -7,4 +8,4 @@ class CartItem(db.Model):
     quantity = db.Column(db.Integer, default=1, nullable=False)
     
     cart = db.relationship('Cart', backref='items')
-    product = db.relationship('Product')
+    product = db.relationship('Product', back_populates='cart_items')
