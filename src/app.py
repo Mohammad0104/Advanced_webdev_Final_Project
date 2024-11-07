@@ -3,6 +3,7 @@ from models import db
 from config.config import Config
 import os
 from controllers.oauth_controller import oauth_bp
+from controllers.product_controller import product_bp
 # from flask_talisman import Talisman
 
 def create_app():
@@ -18,6 +19,7 @@ def create_app():
   
   # Register blueprints
   app.register_blueprint(oauth_bp)
+  app.register_blueprint(product_bp)
   
   with app.app_context():
     if not app.config.get('TESTING', False):
