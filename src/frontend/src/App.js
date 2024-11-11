@@ -29,7 +29,7 @@ function App() {
         </header>
         <div className="App-content">
           <Routes>
-            <Route path="/" element={<HomePage />} /> {/* Add HomePage route */}
+            <Route path="/" element={<HomePage />} /> {/* Add HomePage route1 */}
             <Route path="/add-product" element={<ProductPage products={products} setProducts={setProducts} />} />
             <Route path="/products" element={<ProductListPage products={products} setCart={setCart} />} />
             <Route path="/cart" element={<CartPage cart={cart} />} />
