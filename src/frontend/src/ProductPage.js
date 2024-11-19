@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function ProductPage({ products, setProducts }) {
   const [product, setProduct] = useState({
@@ -31,9 +31,31 @@ function ProductPage({ products, setProducts }) {
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    setProducts([...products, { ...product, id: products.length + 1 }]);
+
+    try {
+      // Send a POST request to the backend to create the product
+      const response = await fetch('/create_product', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...product,
+          seller_id: 1,
+          youth_size: true,
+          image_url: 'something'
+        }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create product');
+    }
+
+    const newProduct = await response.json();
+    setProducts([...products, newProduct]);
+    // setProducts([...products, { ...product, id: products.length + 1 }]);
     setProduct({
       name: '',
       description: '',
@@ -46,8 +68,11 @@ function ProductPage({ products, setProducts }) {
       condition: '',
       manufactureDate: '',
       avgRating: '',
-      image: null,
+      image: '',
     });
+    } catch (error) {
+      console.error('Error creating product: ', error);
+    }
   };
 
   return (
