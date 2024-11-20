@@ -6,6 +6,7 @@ from .cart_item import CartItem
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     seller_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    name = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(300))
     price = db.Column(db.Float, nullable=False)
     gender = db.Column(db.String(30), nullable=False)
@@ -16,7 +17,7 @@ class Product(db.Model):
     sport = db.Column(db.String(30), nullable=False)
     quantity = db.Column(db.Integer, default=1, nullable=False)
     condition = db.Column(db.String(30), nullable=False)
-    image_url = db.Column(db.String(200), nullable=False)
+    image = db.Column(db.LargeBinary, nullable=False)
     date_listed = db.Column(db.Date, nullable=False)
     year_product_made = db.Column(db.String(4))
     avg_rating = db.Column(db.Float)
@@ -35,6 +36,7 @@ class Product(db.Model):
         product_dict = {
             'id': self.id,
             'seller_id': self.seller_id,
+            'name': self.name,
             'description': self.description,
             'price': self.price,
             'gender': self.gender,
@@ -45,7 +47,7 @@ class Product(db.Model):
             'sport': self.sport,
             'quantity': self.quantity,
             'condition': self.condition,
-            'image_url': self.image_url,
+            'image': self.image,
             'date_listed': self.date_listed,
             'year_product_made': self.year_product_made,
             'avg_rating': self.avg_rating,

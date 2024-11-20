@@ -15,7 +15,9 @@ def get_product_by_id(id: int) -> Optional[Product]:
     product = Product.query.filter_by(id=id).first()
     return product
 
-def create_product(seller_id: int, 
+def create_product(
+    seller_id: int, 
+    name: str,
     description: str, 
     price: float, 
     gender: str, 
@@ -26,14 +28,15 @@ def create_product(seller_id: int,
     sport: str, 
     quantity: int, 
     condition: str, 
-    image_url: str, 
+    image: str, 
     date_listed: datetime,
     year_product_made: Optional[str], 
     avg_rating: float) -> Optional[Product]:
     """Create a new product in the db
 
     Args:
-        seller_id (int): id of the user selling/listing the product 
+        seller_id (int): id of the user selling/listing the product
+        name (str): name of the product 
         description (str): description of the product
         price (float): price of the product
         gender (str): gender the product was made for (M, F, Uni-sex)
@@ -44,7 +47,7 @@ def create_product(seller_id: int,
         sport (str): sport(s) of the product
         quantity (int): the amount of the product listed (default=1 initially)
         condition (str): the condition of the product (how used it is: practically new, lightly used, moderately used, heavily used)
-        image_url (str): image url for the product
+        image (str): image url for the product
         date_listed (datetime): datetime the product was listed
         year_product_made (Optional[str]): year the product was originally made (can be null)
         avg_rating (float): average of the ratings given to the product by user reviews (out of 5.0)
@@ -54,6 +57,7 @@ def create_product(seller_id: int,
     """
     product_data = {
         'seller_id': seller_id,
+        'name': name,
         'description': description,
         'price': price,
         'gender': gender,
@@ -63,7 +67,7 @@ def create_product(seller_id: int,
         'brand': brand,
         'sport': sport,
         'condition': condition,
-        'image_url': image_url,
+        'image': image,
         'date_listed': date_listed,
         'year_product_made': year_product_made,
         'avg_rating': avg_rating
@@ -84,6 +88,7 @@ def create_product(seller_id: int,
     
 def update_product(
     product_id: int,
+    name: Optional[str] = None,
     description: Optional[str] = None,
     price: Optional[float] = None,
     gender: Optional[str] = None,
@@ -94,7 +99,7 @@ def update_product(
     sport: Optional[str] = None,
     quantity: Optional[int] = None,
     condition: Optional[str] = None,
-    image_url: Optional[str] = None,
+    image: Optional[str] = None,
     date_listed: Optional[datetime] = None,
     year_product_made: Optional[str] = None,
     avg_rating: Optional[float] = None
@@ -108,6 +113,7 @@ def update_product(
     
     # dictionary of fields to update
     updates = {
+        'name': name,
         'description': description,
         'price': price,
         'gender': gender,
@@ -118,7 +124,7 @@ def update_product(
         'sport': sport,
         'quantity': quantity,
         'condition': condition,
-        'image_url': image_url,
+        'image': image,
         'date_listed': date_listed,
         'year_product_made': year_product_made,
         'avg_rating': avg_rating
