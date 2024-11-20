@@ -4,6 +4,7 @@ from config.config import Config
 import os
 from controllers.oauth_controller import oauth_bp
 from controllers.product_controller import product_bp
+from flask_migrate import Migrate
 # from flask_talisman import Talisman
 
 def create_app():
@@ -14,6 +15,7 @@ def create_app():
   
   # Initialize extensions
   db.init_app(app)
+  migrate = Migrate(app, db)
   
   app.secret_key = Config.SECRET_KEY
   
