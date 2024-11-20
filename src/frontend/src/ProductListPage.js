@@ -1,13 +1,54 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-function ProductListPage({ products, setCart }) {
+function ProductListPage({ setCart }) {
+  const [products, setProducts] = useState([]); // Ensure initial state is an empty array
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('/products'); // Make sure the URL is correct
+        if (!response.ok) {
+          throw new Error('Failed to fetch products');
+        }
+  
+        const data = await response.json();
+        console.log('Fetched data:', data); // Log the entire data structure
+  
+        // Check if data.products is an array
+        if (data && Array.isArray(data.products)) {
+          setProducts(data.products); // Only set it if it's an array
+        } else {
+          console.error('Error: data.products is not an array:', data); // Log the actual data structure
+          throw new Error('Expected an array of products');
+        }
+  
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+  
+    fetchProducts();
+  }, []); // Empty dependency array, so it runs only once when the component mounts
+  
 
   const handleBuy = (product) => {
     setCart((prevCart) => [...prevCart, product]);
     navigate('/cart');
   };
+
+  if (loading) {
+    return <p style={{ textAlign: 'center' }}>Loading products...</p>;
+  }
+
+  if (error) {
+    return <p style={{ textAlign: 'center', color: 'red' }}>{error}</p>;
+  }
 
   return (
     <div style={{ maxWidth: '800px', margin: '20px auto', padding: '20px' }}>
@@ -39,9 +80,9 @@ function ProductListPage({ products, setCart }) {
             <p><strong>Average Rating:</strong> {prod.avgRating}</p>
             {prod.image && (
               <img
-                src={URL.createObjectURL(prod.image)}
+                src={`data:image/png;base64,${prod.image}`} // Assuming the backend sends base64-encoded data
                 alt={prod.name}
-                style={{ width: '100px', height: '100px', objectFit: 'cover', marginTop: '10px' }}
+                style={{ width: '500px', height: '400px', objectFit: 'cover', marginTop: '10px' }}
               />
             )}
             <button
@@ -53,11 +94,14 @@ function ProductListPage({ products, setCart }) {
                 border: 'none',
                 borderRadius: '5px',
                 cursor: 'pointer',
-                marginTop: '10px',
+                marginTop: '20px', // Increase space between the image and button
+                display: 'block', // Ensure the button is block-level and occupies the full width
+                marginLeft: 'auto', // Center the button horizontally
+                marginRight: 'auto',
               }}
             >
               Buy
-            </button>
+          </button>
           </div>
         ))
       )}

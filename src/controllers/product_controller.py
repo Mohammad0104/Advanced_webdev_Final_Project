@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, abort
 from datetime import datetime
-from services.product_service import create_product
+from services import product_service
 from models.product import Product
 import base64
 
@@ -33,7 +33,7 @@ def create_new_product():
     avg_rating = data.get('avg_rating')
 
     # Update the product via the service
-    product = create_product(
+    product = product_service.create_product(
         seller_id=seller_id,
         name=name,
         description=description,
@@ -63,3 +63,49 @@ def create_new_product():
     return jsonify({
         'error': 'Error creating product'
     })
+    
+
+@product_bp.route('/products', methods=['GET'])
+def get_products():
+    """Route used for viewing all the products in the db
+
+    Returns:
+        JSON: list of products with their image base64 encoded
+    """
+    
+    # get all the products in the db
+    products = product_service.get_all_products()
+
+    # making the data into a list and decoding the image
+    products_list = []
+    for product in products:
+        product_dict = product.to_dict()
+        product_dict['image'] = base64.b64encode(product_dict['image']).decode('utf-8')
+        products_list.append(product_dict)
+
+    # returning JSON message with the list of products under products:
+    return jsonify({'products': products_list}), 200
+
+        
+@product_bp.route('/product/<int:product_id>', methods=['GET'])
+def get_product(product_id):
+    """Route to view a specific product by its ID
+
+    Args:
+        product_id (int): the id of the product to view
+
+    Returns:
+        JSON: The product details along with base64-encoded image data
+    """
+    
+    # get the product with the given id
+    product = product_service.get_product_by_id(product_id)
+
+    if not product:
+        return jsonify({'error': 'Product not found'}), 404
+
+    # convert the product to a dictionary and encode the image for JSON
+    product_dict = product.to_dict()
+    product_dict['image'] = base64.b64encode(product_dict['image']).decode('utf-8')
+
+    return jsonify({'product': product_dict}), 200

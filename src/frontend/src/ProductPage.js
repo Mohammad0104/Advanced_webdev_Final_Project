@@ -28,9 +28,18 @@ function ProductPage({ products, setProducts }) {
   };
 
   const handleImageChange = (event) => {
+    const file = event.target.files[0];
+  
+    // maximum size (in bytes)
+    const MAX_FILE_SIZE = 16 * 1024 * 1024; // 16MBB
+
+    if (file && file.size > MAX_FILE_SIZE) {
+      alert('File size is too large. Please upload an image smaller than 2MB.');
+      return; // Exit if file is too large
+    }
     setProduct((prev) => ({
       ...prev,
-      image: event.target.files[0], // Store the selected file
+      image: file, // Store the selected file
     }));
   };
 

@@ -15,6 +15,16 @@ def get_product_by_id(id: int) -> Optional[Product]:
     product = Product.query.filter_by(id=id).first()
     return product
 
+
+def get_all_products() -> list[Product]:
+    """Retrieve all products from the database
+
+    Returns:
+        list[Product]: list of all Product objects
+    """
+    return Product.query.all()
+
+
 def create_product(
     seller_id: int, 
     name: str,
