@@ -18,6 +18,7 @@ instance/
 *.sqlite3
 *.db
 *.sqlite
+migrations/
 
 # Environment variables files
 .env
