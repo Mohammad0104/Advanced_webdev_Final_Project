@@ -12,7 +12,7 @@
   - `python src/app.py`
 - Run frontend in another terminal:
   - `cd src/frontend/src`
-  - `npm build`
+  - `npm install`
   - `npm start`
 
 ## Notes:
