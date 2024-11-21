@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 function ProductListPage({ setCart }) {
-  const [products, setProducts] = useState([]); // Ensure initial state is an empty array
+  const [products, setProducts] = useState([]); // Initial state as an empty array
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -10,32 +10,29 @@ function ProductListPage({ setCart }) {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('/products'); // Make sure the URL is correct
+        const response = await fetch('http://localhost:8080/products'); // Ensure the backend URL is correct
         if (!response.ok) {
           throw new Error('Failed to fetch products');
         }
-  
+
         const data = await response.json();
-        console.log('Fetched data:', data); // Log the entire data structure
-  
-        // Check if data.products is an array
+        console.log('Fetched data:', data); // Debugging the fetched data
+
         if (data && Array.isArray(data.products)) {
-          setProducts(data.products); // Only set it if it's an array
+          setProducts(data.products);
         } else {
-          console.error('Error: data.products is not an array:', data); // Log the actual data structure
-          throw new Error('Expected an array of products');
+          throw new Error('Expected an array of products in the response');
         }
-  
+
         setLoading(false);
       } catch (err) {
         setError(err.message);
         setLoading(false);
       }
     };
-  
+
     fetchProducts();
-  }, []); // Empty dependency array, so it runs only once when the component mounts
-  
+  }, []); // Run once when the component mounts
 
   const handleBuy = (product) => {
     setCart((prevCart) => [...prevCart, product]);
@@ -67,16 +64,44 @@ function ProductListPage({ setCart }) {
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
             }}
           >
-            <h1><strong>{prod.name}</strong>&emsp;&emsp;${prod.price}</h1>
-            <p>{prod.gender}&emsp;&emsp;{prod.size}</p>
-            <p>{prod.brand}&emsp;&emsp;{prod.sport}</p>
-            <p>{prod.condition}</p>
-            <p><strong>Average Rating:</strong> {prod.avgRating}</p>
+            <p>
+              <strong>Name:</strong> {prod.name}
+            </p>
+            <p>
+              <strong>Price:</strong> ${prod.price}
+            </p>
+            <p>
+              <strong>Description:</strong> {prod.description || 'No description available'}
+            </p>
+            <p>
+              <strong>Gender:</strong> {prod.gender}
+            </p>
+            <p>
+              <strong>Size:</strong> {prod.size}
+            </p>
+            <p>
+              <strong>Brand:</strong> {prod.brand}
+            </p>
+            <p>
+              <strong>Sport:</strong> {prod.sport}
+            </p>
+            <p>
+              <strong>Condition:</strong> {prod.condition}
+            </p>
+            <p>
+              <strong>Average Rating:</strong> {prod.avgRating || 'N/A'}
+            </p>
             {prod.image && (
               <img
-                src={`data:image/png;base64,${prod.image}`} // Assuming the backend sends base64-encoded data
+                src={prod.image.startsWith('data:') ? prod.image : `data:image/png;base64,${prod.image}`}
                 alt={prod.name}
-                style={{ width: '500px', height: '400px', objectFit: 'cover', marginTop: '10px' }}
+                style={{
+                  width: '100%',
+                  maxHeight: '400px',
+                  objectFit: 'cover',
+                  marginTop: '10px',
+                  borderRadius: '5px',
+                }}
               />
             )}
             <button
@@ -88,15 +113,26 @@ function ProductListPage({ setCart }) {
                 border: 'none',
                 borderRadius: '5px',
                 cursor: 'pointer',
-                marginTop: '20px', // Increase space between the image and button
-                display: 'block', // Ensure the button is block-level and occupies the full width
-                marginLeft: 'auto', // Center the button horizontally
+                marginTop: '20px',
+                display: 'block',
+                marginLeft: 'auto',
                 marginRight: 'auto',
               }}
             >
               Buy
-          </button>
-          <Link to={`/product/${prod.id}`}>View Details</Link>
+            </button>
+            <Link
+              to={`/product/${prod.id}`}
+              style={{
+                display: 'block',
+                textAlign: 'center',
+                textDecoration: 'none',
+                color: '#007bff',
+                marginTop: '10px',
+              }}
+            >
+              View Details
+            </Link>
           </div>
         ))
       )}

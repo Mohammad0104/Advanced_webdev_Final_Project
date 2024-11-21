@@ -11,7 +11,7 @@ function ProductDetailPage() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await fetch(`/product/${productId}`);
+        const response = await fetch(`http://localhost:8080/products/${productId}`);
         if (!response.ok) {
           throw new Error('Product not found');
         }
