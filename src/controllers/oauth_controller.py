@@ -42,6 +42,8 @@ def oauth2callback():
     # fetch credentials
     credentials = oauth_service.fetch_token(authorization_response)
     
+    print(OAuthService.credentials_to_dict(credentials))
+    
     if not credentials:
         return "Error fetching credentials", 400
     
@@ -50,16 +52,23 @@ def oauth2callback():
     
     # get user info
     user_info = oauth_service.get_user_info(credentials.token)
+    
+    print('\n\n\n')
+    print(user_info)
 
     # add user to db if not already in
     if user_info:
         user = user_service.get_user_by_email(user_info.get('email'))
+        
         if not user:
-            user_service.create_user(
+            user = user_service.create_user(
                 name = user_info.get('name'),
                 email = user_info.get('email'),
                 profile_pic_url = user_info.get('picture')
             )
+        
+        if not user:
+            return "Error creating user", 400  # Handle the case where the user couldn't be created
         
         # add the id to the session (will be used for @login_required)
         session['user_id'] = user.id
