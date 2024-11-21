@@ -8,6 +8,7 @@ import ProductListPage from './ProductListPage';
 import CartPage from './CartPage';
 import ProfilePage from './ProfilePage';
 import Review from './Review';
+import ProductDetailPage from './ProductDetailPage';
 
 function App() {
   const [products, setProducts] = useState([]);
@@ -35,6 +36,7 @@ function App() {
             <Route path="/cart" element={<CartPage cart={cart} />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/reviews" element={<Review />} />
+            <Route path="/product/:productId" element={<ProductDetailPage />} />
           </Routes>
         </div>
       </div>

@@ -67,16 +67,10 @@ function ProductListPage({ setCart }) {
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
             }}
           >
-            <p><strong>Name:</strong> {prod.name}</p>
-            <p><strong>Description:</strong> {prod.description}</p>
-            <p><strong>Price:</strong> ${prod.price}</p>
-            <p><strong>Gender:</strong> {prod.gender}</p>
-            <p><strong>Size:</strong> {prod.size}</p>
-            <p><strong>Brand:</strong> {prod.brand}</p>
-            <p><strong>Sport:</strong> {prod.sport}</p>
-            <p><strong>Quantity:</strong> {prod.quantity}</p>
-            <p><strong>Condition:</strong> {prod.condition}</p>
-            <p><strong>Manufacture Date:</strong> {prod.manufactureDate}</p>
+            <h1><strong>{prod.name}</strong>&emsp;&emsp;${prod.price}</h1>
+            <p>{prod.gender}&emsp;&emsp;{prod.size}</p>
+            <p>{prod.brand}&emsp;&emsp;{prod.sport}</p>
+            <p>{prod.condition}</p>
             <p><strong>Average Rating:</strong> {prod.avgRating}</p>
             {prod.image && (
               <img
@@ -102,6 +96,7 @@ function ProductListPage({ setCart }) {
             >
               Buy
           </button>
+          <Link to={`/product/${prod.id}`}>View Details</Link>
           </div>
         ))
       )}
