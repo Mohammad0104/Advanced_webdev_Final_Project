@@ -154,7 +154,7 @@
 #             'scopes': credentials.scopes
 #         }
 import os
-from flask import jsonify
+from flask import jsonify, session
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 import requests
@@ -263,6 +263,19 @@ class OAuthService:
         else:
             print("Failed to fetch user info:", response.status_code, response.text)
             return None
+    
+    def revoke_token(self, token):
+        revoke_url = f'https://oauth2.googleapis.com/revoke?token={token}'
+        try:
+            response = requests.post(revoke_url)
+            session.pop('user_id', None)  # Remove user_id from session
+            session.pop('credentials', None)  # Optionally, remove credentials if stored
+            if response.status_code == 200:
+                print("Token successfully revoked")
+            else:
+                print("Failed to revoke token")
+        except Exception as e:
+            print(f"Error revoking token: {e}")
 
     @staticmethod
     def credentials_to_dict(credentials):

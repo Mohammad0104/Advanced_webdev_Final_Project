@@ -13,7 +13,7 @@ def create_app():
   app = Flask(__name__)
   app.config.from_object(Config)
   
-  CORS(app, origins=["http://localhost:3000"])  # Allow requests from the frontend
+  CORS(app, supports_credentials=True)  # Allow requests from the frontend
   
   # Talisman(app, force_https=True)
   

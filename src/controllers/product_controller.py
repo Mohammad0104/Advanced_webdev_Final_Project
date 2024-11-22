@@ -4,9 +4,13 @@ from services import product_service
 from models.product import Product
 import base64
 
+from services.auth import login_required
+
 product_bp = Blueprint('product_bp', __name__)
 
+
 @product_bp.route('/create_product', methods=['POST'])
+@login_required
 def create_new_product():
     data = request.get_json()
     

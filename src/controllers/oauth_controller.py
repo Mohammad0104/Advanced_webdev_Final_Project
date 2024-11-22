@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, request, session, jsonify
+from flask import Blueprint, redirect, request, session, jsonify, url_for
 from services.auth import login_required
 from services.oauth.oauth_service import OAuthService
 import requests
@@ -24,6 +24,7 @@ def authorize():
     Returns:
         Redirect user to the authorization URL
     """
+    session['original_url'] = request.args.get('next', 'http://localhost:3000/profile')  # Store the 'next' URL or the current URL
     authorization_url, state = oauth_service.get_authorization_url()
     session['state'] = state  # Store state for verification
     
@@ -73,8 +74,19 @@ def oauth2callback():
         # add the id to the session (will be used for @login_required)
         session['user_id'] = user.id
 
+    # Retrieve the original URL the user was trying to access
+    original_url = session.get('original_url', '/profile')  # Default to '/profile' if not set
+
+    # Clear session data to prevent reuse
+    session.pop('original_url', None)
+    # session.pop('state', None)
+    
+    
     # redirect to the user_info endpoint
-    return redirect('/user_info')
+    # return redirect('/user_info')
+    
+    # redirect back to previous screen
+    return redirect(original_url)
 
 
 @oauth_bp.route('/user_info')
@@ -87,20 +99,47 @@ def user_info():
     """
     
     # if credentials are not stored in the session, redirect to the authorization route
-    if 'credentials' not in session:
-        return redirect('/authorize')
+    # if 'credentials' not in session:
+    #     return redirect('/authorize')
 
-    # create credentials object from the session
-    credentials = google.oauth2.credentials.Credentials(**session['credentials'])
+    try:
+        # create credentials object from the session
+        credentials = google.oauth2.credentials.Credentials(**session['credentials'])
 
-    # get user info with the access token
-    user_info = oauth_service.get_user_info(credentials.token)
+        # get user info with the access token
+        user_info = oauth_service.get_user_info(credentials.token)
     
-    # refresh credentials
-    session['credentials'] = OAuthService.credentials_to_dict(credentials)
+        # refresh credentials
+        session['credentials'] = OAuthService.credentials_to_dict(credentials)
+    except Exception as e:
+        print('Error:', str(e))
+        return
 
     # return user info as JSON
     return jsonify(user_info)
+
+@oauth_bp.route('/logout', methods=['POST'])
+def logout():
+    try:
+        # # Revoke the OAuth token if necessary (optional)
+        # oauth_service = OAuthService()
+        # oauth_service.revoke_token(session['credentials']['token'])
+        
+        # # Clear session data
+        # session.clear()
+        # Check if the 'credentials' are in the session
+        if 'credentials' in session:
+            try:
+                # Revoke the token or perform any other necessary actions
+                oauth_service.revoke_token(session['credentials']['token'])
+            except Exception as e:
+                print(f"Error during token revocation: {e}")
+        
+        return redirect('http://localhost:3000/')
+        # return redirect(url_for('oauth_bp.logout'))  # Redirect to the homepage or login page
+    except Exception as e:
+        print(f"Error logging out: {e}")
+        return jsonify({"error": "Logout failed"}), 500
 
 @oauth_bp.route('/revoke')
 def revoke():
@@ -143,6 +182,12 @@ def clear_credentials():
     # return confirmation message
     return 'Credentials have been cleared.<br><br>' + print_index_table()
 
+
+@oauth_bp.route('/check_login_status', methods=['GET'])
+def check_login():
+    is_logged_in = 'credentials' in session
+    return jsonify({'logged_in': is_logged_in})
+    #return session['credentials'] != None
 
 # to be changed later (from default google example)
 def print_index_table():

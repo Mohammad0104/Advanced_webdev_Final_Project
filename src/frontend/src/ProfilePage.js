@@ -1,141 +1,82 @@
-// import React, { useState, useEffect } from 'react';
-// import { useNavigate } from 'react-router-dom';
-
-// function ProfilePage() {
-//   const [email, setEmail] = useState('');
-//   const [password, setPassword] = useState('');
-//   const [isLogin, setIsLogin] = useState(true); // Toggle between login and register
-//   const [name, setName] = useState(''); // New state for name
-//   const [profilePicUrl, setProfilePicUrl] = useState(''); // New state for profile picture URL
-  
-//   // useEffect(() => {
-//   //   const redirectToOAuth = async () => {
-//   //     try {
-//   //       const response = await fetch('/authorize');  // This will hit the backend route via the proxy
-//   //       if (response.ok) {
-//   //         window.location.href = response.url;  // Redirect user to OAuth login
-//   //       }
-//   //     } catch (error) {
-//   //       console.error('Error redirecting to OAuth:', error);
-//   //     }
-//   //   };
-
-//   //   redirectToOAuth();
-//   // }, []);
-
-//   useEffect(() => {
-//     // Trigger OAuth redirection by calling the /authorize endpoint
-//     const redirectToOAuth = async () => {
-//       try {
-//         const response = await fetch('/authorize'); // Request the OAuth URL from backend
-//         if (response.ok) {
-//           const oauthUrl = await response.text(); // Get the redirect URL from the response
-//           window.location.href = oauthUrl; // Perform the actual redirect
-//         } else {
-//           console.error('Failed to fetch the OAuth URL.');
-//         }
-//       } catch (error) {
-//         console.error('Error fetching OAuth URL:', error);
-//       }
-//     };
-
-//     redirectToOAuth(); // Call the function to redirect user to OAuth
-//   }, []);
-
-//   // Placeholder function for registration
-  
-
-//   const handleRegister = () => {
-//     alert(`Registration successful!\nName: ${name}\nEmail: ${email}\nProfile Picture URL: ${profilePicUrl}`);
-//     // Additional logic can be added here to save user details
-//   };
-
-//   // Placeholder function for login
-//   const handleLogin = () => {
-//     alert(`Login successful!\nEmail: ${email}`);
-//     // Additional logic for login can be added here
-//   };
-
-//   return (
-//     <div className="profile-page">
-//       <h1 className="profile-header">Your Profile</h1>
-//       <form
-//         onSubmit={(e) => {
-//           e.preventDefault();
-//           isLogin ? handleLogin() : handleRegister();
-//         }}
-//         className="profile-form"
-//       >
-//         {!isLogin && (
-//           <>
-//             <input
-//               type="text"
-//               placeholder="Name"
-//               value={name}
-//               onChange={(e) => setName(e.target.value)}
-//               required
-//               className="profile-input"
-//             />
-//             <input
-//               type="text"
-//               placeholder="Profile Picture URL"
-//               value={profilePicUrl}
-//               onChange={(e) => setProfilePicUrl(e.target.value)}
-//               className="profile-input"
-//             />
-//           </>
-//         )}
-//         <input
-//           type="email"
-//           placeholder="Email"
-//           value={email}
-//           onChange={(e) => setEmail(e.target.value)}
-//           required
-//           className="profile-input"
-//         />
-//         <input
-//           type="password"
-//           placeholder="Password"
-//           value={password}
-//           onChange={(e) => setPassword(e.target.value)}
-//           required
-//           className="profile-input"
-//         />
-//         <button type="submit" className="profile-button">
-//           {isLogin ? 'Login' : 'Register'}
-//         </button>
-//       </form>
-//       <p className="toggle-text" onClick={() => setIsLogin(!isLogin)}>
-//         {isLogin ? 'Create an account' : 'Already have an account? Login'}
-//       </p>
-//     </div>
-//   );
-// }
-
-// export default ProfilePage;
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { checkLoginStatus, redirectTo } from './services/authService';
+import { redirect, useNavigate } from 'react-router-dom';
 
 const ProfilePage = () => {
+  const [user, setUser] = useState(null);  // User state to store logged-in user's info
+  const [loading, setLoading] = useState(true);  // Loading state while checking login status
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const initializePage = async () => {
+      const isLoggedIn = await checkLoginStatus(navigate); // Use the checkLoginStatus function from authService
+      if (isLoggedIn) {
+        try {
+          const response = await fetch('/user_info'); // Fetch user info from backend
+          if (response.ok) {
+            const userData = await response.json();
+            setUser(userData); // Set user data if logged in
+          } else {
+            setUser(null); // Set user to null if backend response is not ok
+          }
+        } catch (error) {
+          console.error('Error fetching user info:', error);
+          setUser(null); // Assume user is logged out on error
+        }
+      }
+      setLoading(false); // Stop loading regardless of login status
+    };
+
+    initializePage(); // Run the initialization when the component mounts
+  }, []); // Empty dependency array ensures this runs once on component mount
   
-  // This function redirects the user to the Flask OAuth authorize route
+
+  // Redirect to Flask backend for OAuth login
   const redirectToOAuth = () => {
-    // Redirect to Flask backend for OAuth login
-    window.location.href = 'http://localhost:8080/authorize';
+    redirectTo('/authorize');
+    // window.location.href = 'http://localhost:8080/authorize';
   };
 
+  // Handle log out
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/logout', { method: 'POST' });  // API call to logout
+      if (response.ok) {
+        window.location.href = '/';  // Redirect to home or login page
+      } else {
+        console.error('Logout failed');
+      }
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
+  // If the component is still loading, show a loading spinner or message
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  // If user is logged in, show their profile info
+  if (user) {
+    return (
+      <div>
+        <h1>Your Profile</h1>
+        <div>
+          <img src={user.picture} alt="Profile" width="150" />
+          <p>{user.name}</p>
+          <p>{user.email}</p>
+        </div>
+        <button onClick={handleLogout}>Log Out</button>
+      </div>
+    );
+  }
+
+  // If the user is not logged in, show the login button
   return (
     <div>
       <h1>Profile Page</h1>
-      
-      {/* Button to initiate OAuth login */}
-      <button onClick={redirectToOAuth}>
-        Login with Google
-      </button>
-
-      {/* You can also display user data here if they are logged in */}
-      <div id="user-info">
-        {/* Add conditional rendering here for user information after OAuth flow is completed */}
-      </div>
+      <button onClick={redirectToOAuth}>Login with Google</button>
     </div>
   );
 };
