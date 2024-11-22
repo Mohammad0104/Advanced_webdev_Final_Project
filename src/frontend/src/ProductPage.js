@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { checkLoginStatus, redirectTo } from './services/authService';
+import { checkLoginStatus, redirectTo, get_user_info } from './services/authService';
 import { useNavigate } from 'react-router-dom';
 
 
@@ -54,7 +54,10 @@ function ProductPage({ products, setProducts }) {
 
     const isLoggedIn = await checkLoginStatus(navigate);
     if (isLoggedIn) {
-        handleSubmit(event);
+      const userInfo = await get_user_info();
+      console.log(userInfo);
+      product.seller_id = userInfo.id;
+      handleSubmit(event);
     } else {
         console.log('User not logged in. Form submission halted.');
         redirectTo('/authorize');
@@ -68,7 +71,7 @@ function ProductPage({ products, setProducts }) {
     reader.onload = async () => {
       const base64Image = reader.result; // Base64 string including metadata
       const payload = {
-        seller_id: 1, // modify this later to use the actual id
+        seller_id: product.seller_id,
         name: product.name,
         description: product.description,
         price: product.price,

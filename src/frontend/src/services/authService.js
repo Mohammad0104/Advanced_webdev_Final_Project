@@ -31,20 +31,56 @@ export async function redirectTo(route) {
 }
 
 
-export async function get_user_info(){
+export async function get_oauth_user_info(){
     try {
         const response = await fetch('/user_info'); // Fetch user info from backend
         if (response.ok) {
-          const userData = await response.json();
-          return userData;
+          const oauthUserInfo = await response.json();
+          return oauthUserInfo;
         //   setUser(userData); // Set user data if logged in
         } else {
             return null;
         //   setUser(null); // Set user to null if backend response is not ok
         }
       } catch (error) {
-        console.error('Error fetching user info:', error);
+        console.error('Error fetching oauth user info:', error);
         return null;
         // setUser(null); // Assume user is logged out on error
       }
 }
+
+export async function get_user_info() {
+    const oauthUserInfo = await get_oauth_user_info();
+    console.log(oauthUserInfo);
+    try {
+        const response = await fetch('http://localhost:8080/users/email/'+oauthUserInfo.email);
+        const userInfo = await response.json();
+        
+        return userInfo;
+    }
+    catch (error) {
+        console.error('Error fetching user info:', error);
+        return null;
+    }
+}
+
+// export async function get_user_info(email) {
+//     try {
+//         const route = 'http://localhost:8080/users/email/'+email;
+//         const response = await fetch(route, {
+//             method: 'GET',
+//             headers: {
+//               'Content-Type': 'application/json', // Optional, but useful if you expect JSON
+//             },
+//             credentials: 'include',
+//           });
+//         // const response2 = await fetch(route);
+//         const userDbData = await response.json();
+
+//         return userDbData;
+//       }
+//     catch (error) {
+//         console.error('Error fetching user db info: ', error);
+//         return null;
+//     }
+// }
