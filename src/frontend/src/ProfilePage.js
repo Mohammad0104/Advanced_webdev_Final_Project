@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { checkLoginStatus, redirectTo } from './services/authService';
+import { checkLoginStatus, redirectTo, get_user_info } from './services/authService';
 import { redirect, useNavigate } from 'react-router-dom';
 
 const ProfilePage = () => {
@@ -12,18 +12,8 @@ const ProfilePage = () => {
     const initializePage = async () => {
       const isLoggedIn = await checkLoginStatus(navigate); // Use the checkLoginStatus function from authService
       if (isLoggedIn) {
-        try {
-          const response = await fetch('/user_info'); // Fetch user info from backend
-          if (response.ok) {
-            const userData = await response.json();
-            setUser(userData); // Set user data if logged in
-          } else {
-            setUser(null); // Set user to null if backend response is not ok
-          }
-        } catch (error) {
-          console.error('Error fetching user info:', error);
-          setUser(null); // Assume user is logged out on error
-        }
+        const userData = await get_user_info();
+        setUser(userData);
       }
       setLoading(false); // Stop loading regardless of login status
     };
