@@ -5,11 +5,14 @@ import os
 from controllers.oauth_controller import oauth_bp
 from controllers.product_controller import product_bp
 from flask_migrate import Migrate
+from flask_cors import CORS
 # from flask_talisman import Talisman
 
 def create_app():
   app = Flask(__name__)
   app.config.from_object(Config)
+  
+  CORS(app, supports_credentials=True)  # Allow requests from the frontend
   
   # Talisman(app, force_https=True)
   
