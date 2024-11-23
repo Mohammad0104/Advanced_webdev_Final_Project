@@ -4,6 +4,8 @@ from .cart_item import CartItem
 
 
 class Product(db.Model):
+    __tablename__ = 'product'  # Explicitly define the table name for clarity
+    
     id = db.Column(db.Integer, primary_key=True)
     seller_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     name = db.Column(db.String(50), nullable=False)
@@ -20,19 +22,18 @@ class Product(db.Model):
     image = db.Column(db.LargeBinary, nullable=False)
     date_listed = db.Column(db.Date, nullable=False)
     year_product_made = db.Column(db.String(4))
-    avg_rating = db.Column(db.Float)
+    avg_rating = db.Column(db.Float, default=0.0)  # Default to 0.0 for new products
     
-    seller = db.relationship('User', backref='products') 
-    
-    # reviews = db.relationship('Review', backref='reviewed_product')
-    reviews = db.relationship('Review', back_populates='reviewed_product')
-    
-    # cart_items = db.relationship('CartItem', backref='product')
-    cart_items = db.relationship('CartItem', back_populates='product')
-    
+    # Define relationships
+    seller = db.relationship('User', backref='products', lazy=True)
+    reviews = db.relationship('Review', back_populates='reviewed_product', lazy='dynamic')  # Use lazy='dynamic' for performance
+    cart_items = db.relationship('CartItem', back_populates='product', lazy='dynamic')
     
     def to_dict(self):
-        # Extract relevant data for the product dictionary
+        """
+        Convert the product model to a dictionary representation.
+        This is used for serializing the product object into JSON-friendly data.
+        """
         product_dict = {
             'id': self.id,
             'seller_id': self.seller_id,
@@ -47,11 +48,16 @@ class Product(db.Model):
             'sport': self.sport,
             'quantity': self.quantity,
             'condition': self.condition,
-            'image': self.image,
-            'date_listed': self.date_listed,
+            'image': self.image,  # This will be base64-encoded at the API level
+            'date_listed': self.date_listed.isoformat() if self.date_listed else None,
             'year_product_made': self.year_product_made,
             'avg_rating': self.avg_rating,
         }
 
         return product_dict
     
+    def __repr__(self):
+        """
+        String representation of the Product object for debugging purposes.
+        """
+        return f"<Product {self.name} (ID: {self.id})>"
