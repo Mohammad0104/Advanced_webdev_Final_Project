@@ -5,7 +5,7 @@ from .cart_item import CartItem
 
 class Product(db.Model):
     __tablename__ = 'product'  # Explicitly define the table name for clarity
-    
+
     id = db.Column(db.Integer, primary_key=True)
     seller_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     name = db.Column(db.String(50), nullable=False)
@@ -19,16 +19,16 @@ class Product(db.Model):
     sport = db.Column(db.String(30), nullable=False)
     quantity = db.Column(db.Integer, default=1, nullable=False)
     condition = db.Column(db.String(30), nullable=False)
-    image = db.Column(db.LargeBinary, nullable=False)
+    image = db.Column(db.LargeBinary, nullable=True)  # Allow nullable for optional images
     date_listed = db.Column(db.Date, nullable=False)
     year_product_made = db.Column(db.String(4))
     avg_rating = db.Column(db.Float, default=0.0)  # Default to 0.0 for new products
-    
-    # Define relationships
+
+    # Relationships
     seller = db.relationship('User', backref='products', lazy=True)
-    reviews = db.relationship('Review', back_populates='reviewed_product', lazy='dynamic')  # Use lazy='dynamic' for performance
+    reviews = db.relationship('Review', back_populates='reviewed_product', lazy='dynamic')
     cart_items = db.relationship('CartItem', back_populates='product', lazy='dynamic')
-    
+
     def to_dict(self):
         """
         Convert the product model to a dictionary representation.
@@ -55,7 +55,7 @@ class Product(db.Model):
         }
 
         return product_dict
-    
+
     def __repr__(self):
         """
         String representation of the Product object for debugging purposes.

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
 function ProductDetailPage() {
   const { productId } = useParams();
@@ -15,7 +15,7 @@ function ProductDetailPage() {
       try {
         const response = await fetch(`http://localhost:8080/product/${productId}`);
         if (!response.ok) {
-          throw new Error('Product not found');
+          throw new Error("Product not found");
         }
         const data = await response.json();
         setProduct(data.product);
@@ -44,67 +44,72 @@ function ProductDetailPage() {
     reader.onloadend = () => {
       setFormData((prevFormData) => ({
         ...prevFormData,
-        image: reader.result,
+        image: reader.result, // Base64 encode the image
       }));
     };
-    reader.readAsDataURL(file);
+    if (file) {
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSave = async () => {
     try {
       const response = await fetch(`http://localhost:8080/product/${productId}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update product');
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to update product");
       }
 
       const data = await response.json();
-      setProduct(data.product);
-      setIsEditing(false);
+      setProduct(data.product); // Update the state with the updated product
+      setIsEditing(false); // Exit edit mode
+      alert("Product updated successfully!");
     } catch (err) {
-      console.error('Error updating product:', err);
+      console.error("Error updating product:", err);
+      alert(`Error: ${err.message}`);
     }
   };
 
   if (loading) {
-    return <p style={{ textAlign: 'center', marginTop: '20px' }}>Loading product details...</p>;
+    return <p style={{ textAlign: "center", marginTop: "20px" }}>Loading product details...</p>;
   }
 
   if (error) {
-    return <p style={{ textAlign: 'center', color: 'red', marginTop: '20px' }}>{error}</p>;
+    return <p style={{ textAlign: "center", color: "red", marginTop: "20px" }}>{error}</p>;
   }
 
   if (isEditing) {
     return (
       <div
         style={{
-          maxWidth: '800px',
-          margin: '20px auto',
-          padding: '20px',
-          border: '1px solid #ddd',
-          borderRadius: '10px',
+          maxWidth: "800px",
+          margin: "20px auto",
+          padding: "20px",
+          border: "1px solid #ddd",
+          borderRadius: "10px",
         }}
       >
-        <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Edit Product</h2>
-        <form style={{ display: 'grid', gap: '15px' }}>
+        <h2 style={{ textAlign: "center", marginBottom: "20px" }}>Edit Product</h2>
+        <form style={{ display: "grid", gap: "15px" }}>
           <label>
             Name:
             <input
               type="text"
               name="name"
-              value={formData.name || ''}
+              value={formData.name || ""}
               onChange={handleInputChange}
               style={{
-                width: '100%',
-                padding: '10px',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
+                width: "100%",
+                padding: "10px",
+                borderRadius: "5px",
+                border: "1px solid #ccc",
               }}
             />
           </label>
@@ -112,13 +117,13 @@ function ProductDetailPage() {
             Description:
             <textarea
               name="description"
-              value={formData.description || ''}
+              value={formData.description || ""}
               onChange={handleInputChange}
               style={{
-                width: '100%',
-                padding: '10px',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
+                width: "100%",
+                padding: "10px",
+                borderRadius: "5px",
+                border: "1px solid #ccc",
               }}
             />
           </label>
@@ -127,13 +132,13 @@ function ProductDetailPage() {
             <input
               type="number"
               name="price"
-              value={formData.price || ''}
+              value={formData.price || ""}
               onChange={handleInputChange}
               style={{
-                width: '100%',
-                padding: '10px',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
+                width: "100%",
+                padding: "10px",
+                borderRadius: "5px",
+                border: "1px solid #ccc",
               }}
             />
           </label>
@@ -141,13 +146,13 @@ function ProductDetailPage() {
             Gender:
             <select
               name="gender"
-              value={formData.gender || ''}
+              value={formData.gender || ""}
               onChange={handleInputChange}
               style={{
-                width: '100%',
-                padding: '10px',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
+                width: "100%",
+                padding: "10px",
+                borderRadius: "5px",
+                border: "1px solid #ccc",
               }}
             >
               <option value="">Select Gender</option>
@@ -160,13 +165,13 @@ function ProductDetailPage() {
             Size:
             <select
               name="size"
-              value={formData.size || ''}
+              value={formData.size || ""}
               onChange={handleInputChange}
               style={{
-                width: '100%',
-                padding: '10px',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
+                width: "100%",
+                padding: "10px",
+                borderRadius: "5px",
+                border: "1px solid #ccc",
               }}
             >
               <option value="">Select Size</option>
@@ -181,13 +186,13 @@ function ProductDetailPage() {
             Condition:
             <select
               name="condition"
-              value={formData.condition || ''}
+              value={formData.condition || ""}
               onChange={handleInputChange}
               style={{
-                width: '100%',
-                padding: '10px',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
+                width: "100%",
+                padding: "10px",
+                borderRadius: "5px",
+                border: "1px solid #ccc",
               }}
             >
               <option value="">Select Condition</option>
@@ -199,24 +204,20 @@ function ProductDetailPage() {
           </label>
           <label>
             Image:
-            <input
-              type="file"
-              onChange={handleImageChange}
-              style={{ marginTop: '5px' }}
-            />
+            <input type="file" onChange={handleImageChange} style={{ marginTop: "5px" }} />
           </label>
         </form>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
           <button
             onClick={handleSave}
             style={{
-              padding: '10px 15px',
-              backgroundColor: '#007bff',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer',
-              width: '48%',
+              padding: "10px 15px",
+              backgroundColor: "#007bff",
+              color: "#fff",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+              width: "48%",
             }}
           >
             Save
@@ -224,13 +225,13 @@ function ProductDetailPage() {
           <button
             onClick={() => setIsEditing(false)}
             style={{
-              padding: '10px 15px',
-              backgroundColor: '#6c757d',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer',
-              width: '48%',
+              padding: "10px 15px",
+              backgroundColor: "#6c757d",
+              color: "#fff",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+              width: "48%",
             }}
           >
             Cancel
@@ -243,52 +244,60 @@ function ProductDetailPage() {
   return (
     <div
       style={{
-        maxWidth: '800px',
-        margin: '20px auto',
-        padding: '20px',
-        border: '1px solid #ddd',
-        borderRadius: '10px',
-        backgroundColor: '#f9f9f9',
+        maxWidth: "800px",
+        margin: "20px auto",
+        padding: "20px",
+        border: "1px solid #ddd",
+        borderRadius: "10px",
+        backgroundColor: "#f9f9f9",
       }}
     >
-      <h2 style={{ textAlign: 'center', fontSize: '24px', color: '#333', marginBottom: '20px' }}>
-        Product Details
-      </h2>
-      <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-        <p style={{ fontSize: '20px', margin: '5px 0' }}>
+      <h2 style={{ textAlign: "center", fontSize: "24px", color: "#333", marginBottom: "20px" }}>Product Details</h2>
+      <div style={{ textAlign: "center", marginBottom: "20px" }}>
+        <p style={{ fontSize: "20px", margin: "5px 0" }}>
           <strong>Name:</strong> {product.name}
         </p>
-        <p style={{ fontSize: '20px', margin: '5px 0' }}>
+        <p style={{ fontSize: "20px", margin: "5px 0" }}>
           <strong>Price:</strong> ${product.price}
         </p>
       </div>
-      <div style={{ margin: '20px 0', textAlign: 'center' }}>
-        {product.image && (
-          <img
-            src={`data:image/png;base64,${product.image}`}
-            alt={product.name}
-            style={{ maxWidth: '100%', height: 'auto', borderRadius: '10px' }}
-          />
-        )}
+      <div style={{ margin: "20px 0", textAlign: "center" }}>
+        {product.image && <img src={`data:image/png;base64,${product.image}`} alt={product.name} style={{ maxWidth: "100%", height: "auto", borderRadius: "10px" }} />}
       </div>
-      <p><strong>Description:</strong> {product.description}</p>
-      <p><strong>Brand:</strong> {product.brand}</p>
-      <p><strong>Sport:</strong> {product.sport}</p>
-      <p><strong>Condition:</strong> {product.condition}</p>
-      <p><strong>Gender:</strong> {product.gender}</p>
-      <p><strong>Size:</strong> {product.size}</p>
-      <p><strong>Quantity:</strong> {product.quantity}</p>
-      <p><strong>Manufacture Date:</strong> {product.year_product_made || 'Unknown'}</p>
-      <div style={{ textAlign: 'center', marginTop: '20px' }}>
+      <p>
+        <strong>Description:</strong> {product.description}
+      </p>
+      <p>
+        <strong>Brand:</strong> {product.brand}
+      </p>
+      <p>
+        <strong>Sport:</strong> {product.sport}
+      </p>
+      <p>
+        <strong>Condition:</strong> {product.condition}
+      </p>
+      <p>
+        <strong>Gender:</strong> {product.gender}
+      </p>
+      <p>
+        <strong>Size:</strong> {product.size}
+      </p>
+      <p>
+        <strong>Quantity:</strong> {product.quantity}
+      </p>
+      <p>
+        <strong>Manufacture Date:</strong> {product.year_product_made || "Unknown"}
+      </p>
+      <div style={{ textAlign: "center", marginTop: "20px" }}>
         <button
           onClick={() => setIsEditing(true)}
           style={{
-            padding: '10px 15px',
-            backgroundColor: '#007bff',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
+            padding: "10px 15px",
+            backgroundColor: "#007bff",
+            color: "#fff",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
           }}
         >
           Edit Product
