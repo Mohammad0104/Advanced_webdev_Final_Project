@@ -17,9 +17,9 @@ function ProductDetailPage() {
         }
         const data = await response.json();
         setProduct(data.product);
-        setLoading(false);
       } catch (err) {
         setError(err.message);
+      } finally {
         setLoading(false);
       }
     };
@@ -27,54 +27,59 @@ function ProductDetailPage() {
     fetchProduct();
   }, [productId]);
 
-  if (loading) {
-    return <p>Loading product details...</p>;
-  }
+  if (loading) return <p>Loading product details...</p>;
 
-  if (error) {
-    return <p style={{ color: 'red' }}>{error}</p>;
-  }
+  if (error) return <p style={{ color: 'red' }}>{error}</p>;
 
-  let age_group;
-  if (product.youth_size == true) {
-    age_group = 'Youth';
-  }
-  else {
-    age_group = 'Adult';
-  }
+  // Determine the age group
+  const ageGroup = product.youth_size ? 'Youth' : 'Adult';
 
   return (
-    <div style={{ maxWidth: '800px', margin: '20px auto', padding: '20px' }}>
+    <div style={{ maxWidth: '800px', margin: '20px auto', padding: '20px', fontFamily: 'Arial, sans-serif' }}>
       <h1>{product.name}</h1>
-      <h2>${product.price}</h2>
-      <p><strong>Description:</strong> {product.description}</p>
-      <p>{product.brand}&emsp;{product.sport}</p>
-      <p>{product.condition}</p>
-      <p>{age_group} {product.gender}&emsp;{product.size}</p>
-      <p><strong>Listed at: </strong>{product.date_listed}</p>
+      <h2 style={{ color: '#007bff' }}>${product.price}</h2>
+      <p><strong>Description:</strong> {product.description || 'No description provided.'}</p>
+      <p><strong>Brand:</strong> {product.brand}</p>
+      <p><strong>Sport:</strong> {product.sport}</p>
+      <p><strong>Condition:</strong> {product.condition}</p>
+      <p><strong>Age Group:</strong> {ageGroup}</p>
+      <p><strong>Gender:</strong> {product.gender}</p>
+      <p><strong>Size:</strong> {product.size}</p>
+      <p><strong>Listed at:</strong> {product.date_listed || 'Unknown'}</p>
       <p><strong>Quantity:</strong> {product.quantity}</p>
-      <p><strong>Manufacture Date:</strong> {product.manufactureDate || "unknown"}</p>
+      <p><strong>Manufacture Date:</strong> {product.manufactureDate || 'Unknown'}</p>
+
       {product.image && (
         <img
           src={`data:image/png;base64,${product.image}`} // Assuming base64 image data
           alt={product.name}
-          style={{ width: '500px', height: '400px', objectFit: 'cover', marginTop: '10px' }}
+          style={{
+            width: '100%',
+            maxWidth: '500px',
+            height: 'auto',
+            objectFit: 'cover',
+            marginTop: '10px',
+            borderRadius: '10px',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+          }}
         />
       )}
-      
-      {/* Flexbox container for the two buttons */}
+
+      {/* Flexbox container for buttons */}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
         <button
           onClick={() => navigate('/')} // Navigate to home
           style={{
-            padding: '10px 15px',
+            padding: '10px 20px',
             backgroundColor: '#007bff',
             color: '#fff',
             border: 'none',
             borderRadius: '5px',
             cursor: 'pointer',
-            width: '48%' // Make the buttons take up 48% of the width each
+            transition: 'background-color 0.3s',
           }}
+          onMouseOver={(e) => (e.target.style.backgroundColor = '#0056b3')}
+          onMouseOut={(e) => (e.target.style.backgroundColor = '#007bff')}
         >
           Back to Home
         </button>
@@ -82,14 +87,16 @@ function ProductDetailPage() {
         <button
           onClick={() => navigate('/products')} // Navigate to product list
           style={{
-            padding: '10px 15px',
+            padding: '10px 20px',
             backgroundColor: '#007bff',
             color: '#fff',
             border: 'none',
             borderRadius: '5px',
             cursor: 'pointer',
-            width: '48%' // Make the buttons take up 48% of the width each
+            transition: 'background-color 0.3s',
           }}
+          onMouseOver={(e) => (e.target.style.backgroundColor = '#0056b3')}
+          onMouseOut={(e) => (e.target.style.backgroundColor = '#007bff')}
         >
           Back to Product List
         </button>
