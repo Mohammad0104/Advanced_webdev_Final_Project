@@ -3,10 +3,14 @@ from datetime import datetime
 from services import product_service
 import base64
 
+from services.auth import login_required
+
 product_bp = Blueprint('product_bp', __name__)
+
 
 # Create a new product
 @product_bp.route('/create_product', methods=['POST'])
+@login_required
 def create_new_product():
     try:
         data = request.get_json()

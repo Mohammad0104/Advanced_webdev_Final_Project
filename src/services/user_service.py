@@ -80,5 +80,3 @@ def update_name(id: int, new_name: str):
     # if there is no user with the given id
     else:
         return jsonify({'error': 'User with that id not found.  Name not updated.'}), 404
-
-    

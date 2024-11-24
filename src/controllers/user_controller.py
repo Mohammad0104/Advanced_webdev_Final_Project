@@ -66,9 +66,10 @@ def update_user_name(user_id):
 def get_user_by_email_route(email):
     # Fetch a user by their email
     user = get_user_by_email(email)
+
     if user:
         # If the user is found, serialize their data and return it with a 200 OK status
-        return jsonify(user.serialize()), 200
+        return jsonify(user.to_dict()), 200
     else:
         # If no user is found, return an error message with a 404 NOT FOUND status
         return jsonify({'message': 'User not found'}), 404

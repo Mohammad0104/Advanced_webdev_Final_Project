@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { checkLoginStatus, redirectTo, get_user_info } from './services/authService';
+import { useNavigate } from 'react-router-dom';
+
 
 function ProductPage({ products, setProducts }) {
+
+  const navigate = useNavigate();
+
   const [product, setProduct] = useState({
     name: '',
     description: '',
@@ -43,6 +49,21 @@ function ProductPage({ products, setProducts }) {
     }));
   };
 
+  const handleFormSubmit = async (event) => {
+    event.preventDefault(); // Prevent default form submission
+
+    const isLoggedIn = await checkLoginStatus(navigate);
+    if (isLoggedIn) {
+      const userInfo = await get_user_info();
+      console.log(userInfo);
+      product.seller_id = userInfo.id;
+      handleSubmit(event);
+    } else {
+        console.log('User not logged in. Form submission halted.');
+        redirectTo('/authorize');
+    }
+};
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -50,7 +71,7 @@ function ProductPage({ products, setProducts }) {
     reader.onload = async () => {
       const base64Image = reader.result; // Base64 string including metadata
       const payload = {
-        seller_id: 1, // modify this later to use the actual id
+        seller_id: product.seller_id,
         name: product.name,
         description: product.description,
         price: product.price,
@@ -75,18 +96,30 @@ function ProductPage({ products, setProducts }) {
           },
           body: JSON.stringify(payload),
         });
+      
+        // Log the response status and the body
+        // console.log('Response Status:', response.status);
+        const responseBody = await response.text();
+        // console.log('Response Body:', responseBody);
 
+      
         if (!response.ok) {
-          throw new Error('Failed to create product');
+          throw new Error(`Failed to create product: ${responseBody}`);
         }
 
-        const result = await response.json();
+        const result = JSON.parse(responseBody);  // Parse the response body as JSON
+      
+        // console.log('Product created successfully:', result);
         console.log('Product created successfully:', result);
       } catch (error) {
         console.error('Error creating product:', error);
+        alert('Failed to add the product');
       }
+      
     };
     reader.readAsDataURL(product.image);
+
+    alert('Product added successfully!');
     
     // Reset form or update state
     setProduct({
@@ -108,7 +141,7 @@ function ProductPage({ products, setProducts }) {
   return (
     <div>
       <h1>Product Page</h1>
-      <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
+      <form onSubmit={handleFormSubmit} style={{ marginBottom: '20px' }}>
         <input type="text" name="name" placeholder="Name" value={product.name} onChange={handleChange} required />
         
         <input type="text" name="description" placeholder="Description" value={product.description} onChange={handleChange} required />

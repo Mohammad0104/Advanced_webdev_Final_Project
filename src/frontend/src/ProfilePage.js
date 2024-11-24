@@ -1,78 +1,74 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { checkLoginStatus, redirectTo, get_user_info } from './services/authService';
+import { redirect, useNavigate } from 'react-router-dom';
 
-function ProfilePage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLogin, setIsLogin] = useState(true); // Toggle between login and register
-  const [name, setName] = useState(''); // New state for name
-  const [profilePicUrl, setProfilePicUrl] = useState(''); // New state for profile picture URL
+const ProfilePage = () => {
+  const [user, setUser] = useState(null);  // User state to store logged-in user's info
+  const [loading, setLoading] = useState(true);  // Loading state while checking login status
 
-  // Placeholder function for registration
-  const handleRegister = () => {
-    alert(`Registration successful!\nName: ${name}\nEmail: ${email}\nProfile Picture URL: ${profilePicUrl}`);
-    // Additional logic can be added here to save user details
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const initializePage = async () => {
+      const isLoggedIn = await checkLoginStatus(navigate); // Use the checkLoginStatus function from authService
+      if (isLoggedIn) {
+        const userData = await get_user_info();
+        setUser(userData);
+      }
+      setLoading(false); // Stop loading regardless of login status
+    };
+
+    initializePage(); // Run the initialization when the component mounts
+  }, []); // Empty dependency array ensures this runs once on component mount
+  
+
+  // Redirect to Flask backend for OAuth login
+  const redirectToOAuth = () => {
+    redirectTo('/authorize');
+    // window.location.href = 'http://localhost:8080/authorize';
   };
 
-  // Placeholder function for login
-  const handleLogin = () => {
-    alert(`Login successful!\nEmail: ${email}`);
-    // Additional logic for login can be added here
+  // Handle log out
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/logout', { method: 'POST' });  // API call to logout
+      if (response.ok) {
+        window.location.href = '/';  // Redirect to home or login page
+      } else {
+        console.error('Logout failed');
+      }
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
   };
 
+  // If the component is still loading, show a loading spinner or message
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  // If user is logged in, show their profile info
+  if (user) {
+    return (
+      <div>
+        <h1>Your Profile</h1>
+        <div>
+          <img src={user.picture} alt="Profile" width="150" />
+          <p>{user.name}</p>
+          <p>{user.email}</p>
+        </div>
+        <button onClick={handleLogout}>Log Out</button>
+      </div>
+    );
+  }
+
+  // If the user is not logged in, show the login button
   return (
-    <div className="profile-page">
-      <h1 className="profile-header">Your Profile</h1>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          isLogin ? handleLogin() : handleRegister();
-        }}
-        className="profile-form"
-      >
-        {!isLogin && (
-          <>
-            <input
-              type="text"
-              placeholder="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="profile-input"
-            />
-            <input
-              type="text"
-              placeholder="Profile Picture URL"
-              value={profilePicUrl}
-              onChange={(e) => setProfilePicUrl(e.target.value)}
-              className="profile-input"
-            />
-          </>
-        )}
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="profile-input"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className="profile-input"
-        />
-        <button type="submit" className="profile-button">
-          {isLogin ? 'Login' : 'Register'}
-        </button>
-      </form>
-      <p className="toggle-text" onClick={() => setIsLogin(!isLogin)}>
-        {isLogin ? 'Create an account' : 'Already have an account? Login'}
-      </p>
+    <div>
+      <h1>Profile Page</h1>
+      <button onClick={redirectToOAuth}>Login with Google</button>
     </div>
   );
-}
+};
 
 export default ProfilePage;
