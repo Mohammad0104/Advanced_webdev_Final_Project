@@ -6,6 +6,7 @@ from controllers.oauth_controller import oauth_bp
 from controllers.product_controller import product_bp
 from controllers.user_controller import user_blueprint
 from flask_migrate import Migrate
+from flask_cors import CORS
 # from flask_talisman import Talisman
 
 def create_app():
