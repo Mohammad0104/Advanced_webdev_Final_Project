@@ -6,6 +6,7 @@ from controllers.oauth_controller import oauth_bp
 from controllers.product_controller import product_bp
 from controllers.user_controller import user_blueprint
 from controllers.review_controller import review_blueprint
+from controllers.order_controller import order_bp
 from flask_migrate import Migrate
 from flask_cors import CORS
 # from flask_talisman import Talisman
@@ -29,6 +30,7 @@ def create_app():
   app.register_blueprint(product_bp)
   app.register_blueprint(user_blueprint)
   app.register_blueprint(review_blueprint)
+  app.register_blueprint(order_bp)
   
   with app.app_context():
     if not app.config.get('TESTING', False):
