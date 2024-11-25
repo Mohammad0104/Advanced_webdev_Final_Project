@@ -1,22 +1,45 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { checkLoginStatus, get_user_info, redirectTo } from './services/authService';
+import ReactStars from 'react-stars';
 
-function Review({ productId }) {
+function Review() {
+  const navigate = useNavigate();
+
+  const { productId } = useParams();
+
   const [reviews, setReviews] = useState([]);
   const [reviewText, setReviewText] = useState('');
   const [rating, setRating] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [sellerId, setSellerId] = useState(null);
+
+  // Function to check login status and user info
+  const checkUserLoginStatus = async () => {
+    const isLoggedIn = await checkLoginStatus(navigate);
+    if (isLoggedIn) {
+      const userInfo = await get_user_info();
+      console.log(userInfo);
+      setSellerId(userInfo.id); // Assign this to a product or something else
+    } else {
+      console.log('User not logged in. Redirecting...');
+        redirectTo('/authorize');
+    }
+  };
 
   // Fetch reviews from the backend
   useEffect(() => {
+    checkUserLoginStatus();
     const fetchReviews = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8080/product/${productId}/reviews`);
+        const response = await fetch(`http://localhost:8080/reviews/product/${productId}`);
         if (!response.ok) {
           throw new Error('Failed to fetch reviews');
         }
         const data = await response.json();
+        console.log(data);
         setReviews(data.reviews);
         setLoading(false);
       } catch (err) {
@@ -31,8 +54,12 @@ function Review({ productId }) {
   const handleAddReview = async () => {
     if (reviewText.trim() && rating > 0) {
       try {
-        const newReview = { review_text: reviewText, rating };
-        const response = await fetch(`http://localhost:8080/product/${productId}/reviews`, {
+        const newReview = { 
+          explanation: reviewText, 
+          rating , 
+          product_id: productId, 
+          reviewer_id: sellerId};
+        const response = await fetch(`http://localhost:8080/create_review`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(newReview),
@@ -43,7 +70,16 @@ function Review({ productId }) {
         }
 
         const data = await response.json();
-        setReviews([...reviews, data.review]); // Add the new review to the list
+
+        const createdReview = {
+          id: data.id, // From the backend response
+          explanation: reviewText, // Local review text
+          rating: rating, // Local rating
+          product_id: productId,
+          reviewer_id: sellerId, // This can be dynamic if you have user authentication
+        };
+
+        setReviews([...reviews, createdReview]); // Add the new review to the list
         setReviewText(''); // Clear input fields
         setRating(0);
       } catch (err) {
@@ -54,37 +90,45 @@ function Review({ productId }) {
     }
   };
 
+
   return (
-    <div style={{ maxWidth: '800px', margin: '20px auto', padding: '20px', border: '1px solid #ddd', borderRadius: '10px' }}>
-      <h1 style={{ textAlign: 'center' }}>Product Reviews</h1>
+    <div style={{ maxWidth: '900px', margin: '20px auto', padding: '20px', borderRadius: '10px', backgroundColor: '#d3d3d3' }}>
+      <h1 style={{ textAlign: 'center', fontWeight: 'normal' }}>
+        Write a Review for{' '}
+        {reviews.length > 0 ? (
+          <strong>{reviews[0].product_name}</strong>
+        ) : (
+          <span>Loading product name...</span>
+        )}
+      </h1>
+      {reviews.length > 0 && <p><strong>Seller:</strong> {reviews[0].seller_name}</p>}
+
       <div style={{ marginBottom: '20px' }}>
         <textarea
           placeholder="Write your review..."
           value={reviewText}
           onChange={(e) => setReviewText(e.target.value)}
-          style={{ width: '100%', height: '80px', marginBottom: '10px', borderRadius: '5px', padding: '10px', border: '1px solid #ccc' }}
+          style={{ width: '90%', height: '80px', marginBottom: '10px', borderRadius: '5px', padding: '10px', border: '1px solid black', backgroundColor: '#d3d3d3' }}
         ></textarea>
         <br />
         <label>
           <strong>Rating:</strong>
-          <select
-            value={rating}
-            onChange={(e) => setRating(Number(e.target.value))}
-            style={{ marginLeft: '10px', padding: '5px', borderRadius: '5px', border: '1px solid #ccc' }}
-          >
-            <option value={0}>Select Rating</option>
-            <option value={1}>1 - Poor</option>
-            <option value={2}>2 - Fair</option>
-            <option value={3}>3 - Good</option>
-            <option value={4}>4 - Very Good</option>
-            <option value={5}>5 - Excellent</option>
-          </select>
+          <div style={{ marginLeft: '10px', display: 'flex', justifyContent: 'center', color: 'black'}}>
+            <ReactStars
+                count={5} // Total number of stars
+                value={rating} // Current rating value
+                onChange={setRating} // Callback to update the rating
+                size={60} // Size of the stars
+                color2={'gold'} // Color for filled stars (gold)
+                color1={'#A0A0A0'} // Color for empty stars (light gray)
+                half={true} // Allow half stars
+            />
+          </div>
         </label>
         <br />
         <button
           onClick={handleAddReview}
           style={{
-            marginTop: '10px',
             padding: '10px 20px',
             backgroundColor: '#007bff',
             color: '#fff',
@@ -96,26 +140,62 @@ function Review({ productId }) {
           Add Review
         </button>
       </div>
-      <div>
-        <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>All Reviews</h2>
-        {loading ? (
-          <p>Loading reviews...</p>
-        ) : error ? (
-          <p style={{ color: 'red' }}>{error}</p>
-        ) : reviews.length === 0 ? (
-          <p>No reviews yet.</p>
-        ) : (
-          reviews.map((review) => (
-            <div key={review.id} style={{ border: '1px solid #ddd', padding: '10px', marginBottom: '10px', borderRadius: '5px' }}>
-              <p>
-                <strong>Review:</strong> {review.review_text}
-              </p>
-              <p>
-                <strong>Rating:</strong> {review.rating}/5
-              </p>
+      <div style={{ borderRadius: '5px', padding: '10px', marginTop: '80px', backgroundColor: '#333'}}>
+        <div>
+          <h2 style={{ textAlign: 'center', marginBottom: '0px', color: 'white', fontWeight: 'normal' }}>
+            All Reviews for{' '}
+            {reviews.length > 0 ? (
+              <strong>{reviews[0].product_name}</strong>
+            ) : (
+              <span>Loading product name...</span>
+            )}
+          </h2>
+          <p style={{color: '#C0C0C0', marginBottom: '50px', fontSize: 'small'}}>If reviews are not loading, refresh page</p>
+          {loading ? (
+            <p>Loading reviews...</p>
+          ) : error ? (
+            <p style={{ color: 'red' }}>{error}</p>
+          ) : reviews.length === 0 ? (
+            <p>No reviews yet.</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {reviews.map((review, index) => (
+              <div key={review.id} 
+              style={{ 
+                 padding: '10px', 
+                 marginBottom: '20px', 
+                 borderRadius: '5px',
+                 backgroundColor: index % 2 === 0 ? '	#B0B0B0' : '#888888',
+                 maxWidth: '75%',
+                 width: '100%',
+                 textAlign: 'center'
+              }}>
+                <p>
+                  <strong>Review:</strong> {review.explanation}
+                </p>
+                <div>
+                  <strong>Rating:</strong>
+                  <div style={{ marginLeft: '10px', display: 'flex', justifyContent: 'center' }}>
+                    <ReactStars
+                      className="bold-stars"
+                      count={5} // Total number of stars
+                      value={review.rating} // Current rating value
+                      size={30} // Size of the stars
+                      color2={'gold'} // Color for filled stars (gold)
+                      color1={'#333'} // Color for empty stars (light gray)
+                      half={true} // Allow half stars
+                      edit={false}
+                    />
+                  </div>
+                </div>
+                <p>
+                  <strong>Reviewer:</strong> {review.reviewer_name}
+                </p>
+              </div>
+            ))}
             </div>
-          ))
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

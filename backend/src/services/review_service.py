@@ -10,6 +10,7 @@ def add_review(reviewer_id, product_id, rating, explanation):
         explanation=explanation,  # Textual explanation of the review
         review_date=datetime.utcnow()  # Current time in UTC as the review date
     )
+    
     # Add the new review to the database session
     db.session.add(new_review)
     # Commit the session to save the review to the database
@@ -19,7 +20,30 @@ def add_review(reviewer_id, product_id, rating, explanation):
 
 def get_reviews_by_product(product_id):
     # Retrieve all reviews from the database that match the specified product ID
-    return Review.query.filter_by(product_id=product_id).all()
+    # return Review.query.filter_by(product_id=product_id).all()
+    try:
+        # Retrieve all reviews with product and seller information
+        reviews = Review.query.filter_by(product_id=product_id).all()
+        
+        # Format reviews data with product and seller info
+        reviews_data = [
+            {
+                'id': review.id,
+                'rating': review.rating,
+                'explanation': review.explanation,
+                'review_date': review.review_date.isoformat(),
+                'reviewer_name': review.reviewing_user.name,
+                'seller_id': review.reviewed_product.seller_id,
+                'seller_name': review.reviewing_user.name,
+                'product_id': review.product_id,
+                'product_name': review.reviewed_product.name 
+            }
+            for review in reviews
+        ]
+        return reviews_data
+    except Exception as e:
+        raise Exception(f"Error retrieving reviews: {str(e)}")
+    
 
 def delete_review(review_id):
     # Retrieve the review by its ID

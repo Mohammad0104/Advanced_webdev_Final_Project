@@ -4,13 +4,15 @@ from services.review_service import add_review, get_reviews_by_product, delete_r
 # Create a Flask Blueprint named 'review' for review-related routes
 review_blueprint = Blueprint('review', __name__)
 
-@review_blueprint.route('/reviews', methods=['POST'])
+@review_blueprint.route('/create_review', methods=['POST'])
 def create_review():
     """
     Route to create a new review for a product.
     Expects JSON payload with reviewer_id, product_id, rating, and explanation.
     """
     data = request.get_json()
+    
+    print(data)
 
     # Validate required fields
     required_fields = ('reviewer_id', 'product_id', 'rating', 'explanation')
@@ -24,7 +26,7 @@ def create_review():
         review = add_review(
             reviewer_id=data['reviewer_id'],
             product_id=data['product_id'],
-            rating=int(data['rating']),  # Ensure rating is an integer
+            rating=float(data['rating']),  # Ensure rating is a float
             explanation=str(data['explanation'])  # Ensure explanation is a string
         )
         # Return success response
@@ -43,21 +45,23 @@ def retrieve_reviews(product_id):
     try:
         # Fetch reviews from the service
         reviews = get_reviews_by_product(product_id)
+        
+        print(reviews)
 
         if not reviews:
             return jsonify({'message': 'No reviews found for this product'}), 404
 
         # Format reviews into JSON response
-        reviews_data = [
-            {
-                'id': r.id,
-                'rating': r.rating,
-                'explanation': r.explanation,
-                'review_date': r.review_date.isoformat()
-            }
-            for r in reviews
-        ]
-        return jsonify({'reviews': reviews_data}), 200
+        # reviews_data = [
+        #     {
+        #         'id': r.id,
+        #         'rating': r.rating,
+        #         'explanation': r.explanation,
+        #         'review_date': r.review_date.isoformat()
+        #     }
+        #     for r in reviews
+        # ]
+        return jsonify({'reviews': reviews}), 200
     except Exception as e:
         return jsonify({'error': f'Failed to retrieve reviews: {str(e)}'}), 500
 

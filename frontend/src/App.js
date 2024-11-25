@@ -25,7 +25,7 @@ function App() {
             <Link to="/products" className="App-link">View Products</Link>
             <Link to="/cart" className="App-link">View Cart</Link>
             <Link to="/profile" className="App-link">Profile</Link>
-            <Link to="/reviews" className="App-link">Reviews</Link>
+            <Link to="/reviews/product/:productId" className="App-link">Reviews</Link>
           </nav>
         </header>
         <div className="App-content">
@@ -35,7 +35,7 @@ function App() {
             <Route path="/products" element={<ProductListPage products={products} setCart={setCart} />} />
             <Route path="/cart" element={<CartPage cart={cart} />} />
             <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/reviews" element={<Review />} />
+            <Route path="/reviews/product/:productId" element={<Review />} />
             <Route path="/product/:productId" element={<ProductDetailPage />} />
           </Routes>
         </div>

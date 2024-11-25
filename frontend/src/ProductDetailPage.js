@@ -288,7 +288,7 @@ function ProductDetailPage() {
       <p>
         <strong>Manufacture Date:</strong> {product.year_product_made || "Unknown"}
       </p>
-      <div style={{ textAlign: "center", marginTop: "20px" }}>
+      <div style={{ textAlign: "center", marginTop: "20px", display: 'flex', justifyContent: 'center' }}>
         <button
           onClick={() => setIsEditing(true)}
           style={{
@@ -303,6 +303,24 @@ function ProductDetailPage() {
           Edit Product
         </button>
       </div>
+      <div style={{ textAlign: "center", marginTop: "20px", display: 'flex', justifyContent: 'center'}}>
+        <button
+          onClick={() => navigate(`/reviews/product/${productId}`, { state: { productId } })} // Navigate to review page
+          // onClick={() => navigate(`/product/${productId}/review`)} // Navigate to review page
+          style={{
+            padding: "10px 15px",
+            backgroundColor: "#28a745",
+            color: "#fff",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+            marginLeft: "10px", // Optional spacing if placed next to Edit button
+          }}
+        >
+          Reviews
+        </button>
+</div>
+
     </div>
   );
 }
