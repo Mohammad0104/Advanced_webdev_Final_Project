@@ -53,7 +53,7 @@ const ProfilePage = () => {
       <div>
         <h1>Your Profile</h1>
         <div>
-          <img src={user.picture} alt="Profile" width="150" />
+          <img src={user.profile_pic_url} alt="Profile" width="150" />
           <p>{user.name}</p>
           <p>{user.email}</p>
         </div>
