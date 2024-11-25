@@ -30,26 +30,26 @@ function Review() {
     }
   };
 
+  const fetchReviews = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${BACKEND_BASE_URL}/reviews/product/${productId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch reviews');
+      }
+      const data = await response.json();
+      console.log(data);
+      setReviews(data.reviews);
+      setLoading(false);
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+    }
+  };
+
   // Fetch reviews from the backend
   useEffect(() => {
     checkUserLoginStatus();
-    const fetchReviews = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`${BACKEND_BASE_URL}/reviews/product/${productId}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch reviews');
-        }
-        const data = await response.json();
-        console.log(data);
-        setReviews(data.reviews);
-        setLoading(false);
-      } catch (err) {
-        setError(err.message);
-        setLoading(false);
-      }
-    };
-
     fetchReviews();
   }, [productId]);
 
@@ -85,6 +85,7 @@ function Review() {
         alert('Review created successfully!');
         setReviewText(''); // Clear input fields
         setRating(0);
+        fetchReviews();
       } catch (err) {
         alert(err.message);
       }
@@ -101,7 +102,7 @@ function Review() {
         {reviews.length > 0 ? (
           <strong>{reviews[0].product_name}</strong>
         ) : (
-          <span>Loading product name...</span>
+          <span>this product</span>
         )}
       </h1>
       {reviews.length > 0 && <p><strong>Seller:</strong> {reviews[0].seller_name}</p>}
@@ -146,21 +147,20 @@ function Review() {
       <div style={{ borderRadius: '5px', padding: '10px', marginTop: '80px', backgroundColor: '#333'}}>
         <div>
           <h2 style={{ textAlign: 'center', marginBottom: '0px', color: 'white', fontWeight: 'normal' }}>
-            All Reviews for{' '}
             {reviews.length > 0 ? (
-              <strong>{reviews[0].product_name}</strong>
+              `All Reviews for ${reviews[0].product_name}`
             ) : (
-              <span>Loading product name...</span>
+              "No reviews yet for this product"
             )}
           </h2>
           <p style={{color: '#C0C0C0', marginBottom: '50px', fontSize: 'small'}}>If reviews are not loading, refresh page</p>
           {loading ? (
-            <p>Loading reviews...</p>
-          ) : error ? (
-            <p style={{ color: 'red' }}>{error}</p>
-          ) : reviews.length === 0 ? (
-            <p>No reviews yet.</p>
-          ) : (
+              <p>Loading reviews...</p>
+            ) : error ? (
+              <p style={{ color: 'red' }}>{error}</p>
+            ) : reviews.length === 0 ? (
+              <p>No reviews yet for this product.</p>
+            ) : (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             {reviews.map((review, index) => (
               <div key={review.id} 

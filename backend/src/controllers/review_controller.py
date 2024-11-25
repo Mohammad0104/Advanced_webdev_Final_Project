@@ -49,7 +49,8 @@ def retrieve_reviews(product_id):
         print(reviews)
 
         if not reviews:
-            return jsonify({'message': 'No reviews found for this product'}), 404
+            return jsonify({'reviews': [], 'message': 'No reviews yet for this product'}), 200
+        
 
         # Format reviews into JSON response
         # reviews_data = [
