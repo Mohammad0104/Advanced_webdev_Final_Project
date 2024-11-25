@@ -19,7 +19,7 @@ export async function checkLoginStatus(navigate) {
         return true;
     } catch (error) {
         console.error('Error checking login status:', error);
-        navigate('/'); // Optional: Redirect to an error page
+        navigate('/profile'); // Optional: Redirect to an error page
         return false;
     }
 }

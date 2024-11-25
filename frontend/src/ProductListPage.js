@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { BACKEND_BASE_URL } from './constants';
 
 function ProductListPage({ setCart }) {
   const [products, setProducts] = useState([]); // Initial state as an empty array
@@ -10,7 +11,7 @@ function ProductListPage({ setCart }) {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('http://localhost:8080/products'); // Ensure the backend URL is correct
+        const response = await fetch(`${BACKEND_BASE_URL}/products`);
         if (!response.ok) {
           throw new Error('Failed to fetch products');
         }

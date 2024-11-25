@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { checkLoginStatus, redirectTo, get_user_info } from './services/authService';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { FRONTEND_BASE_URL, BACKEND_BASE_URL } from './constants';
 
 
 function ProductPage({ products, setProducts }) {
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [product, setProduct] = useState({
     name: '',
@@ -21,6 +23,27 @@ function ProductPage({ products, setProducts }) {
     avgRating: '',
     image: null,
   });
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [seller_id, setSellerId] = useState(null);
+
+  // Check login status as soon as the page is entered
+  useEffect(() => {
+    const checkStatus = async () => {
+      const loginStatus = await checkLoginStatus(navigate);
+      if (loginStatus) {
+        setIsLoggedIn(true);
+        const userInfo = await get_user_info();
+        setSellerId(userInfo.id);
+
+      } else {
+        setIsLoggedIn(false);
+        redirectTo(`/authorize?next=${FRONTEND_BASE_URL}${location.pathname}`);
+      }
+    };
+
+    checkStatus();
+  }, [navigate, location]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -49,20 +72,20 @@ function ProductPage({ products, setProducts }) {
     }));
   };
 
-  const handleFormSubmit = async (event) => {
-    event.preventDefault(); // Prevent default form submission
+//   const handleFormSubmit = async (event) => {
+//     event.preventDefault(); // Prevent default form submission
 
-    const isLoggedIn = await checkLoginStatus(navigate);
-    if (isLoggedIn) {
-      const userInfo = await get_user_info();
-      console.log(userInfo);
-      product.seller_id = userInfo.id;
-      handleSubmit(event);
-    } else {
-        console.log('User not logged in. Form submission halted.');
-        redirectTo('/authorize');
-    }
-};
+//     const isLoggedIn = await checkLoginStatus(navigate);
+//     if (isLoggedIn) {
+//       const userInfo = await get_user_info();
+//       console.log(userInfo);
+//       product.seller_id = userInfo.id;
+//       handleSubmit(event);
+//     } else {
+//         console.log('User not logged in. Form submission halted.');
+//         redirectTo(`/authorize?next=${FRONTEND_BASE_URL}${location.pathname}`);
+//     }
+// };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -71,7 +94,7 @@ function ProductPage({ products, setProducts }) {
     reader.onload = async () => {
       const base64Image = reader.result; // Base64 string including metadata
       const payload = {
-        seller_id: product.seller_id,
+        seller_id: seller_id,
         name: product.name,
         description: product.description,
         price: product.price,
@@ -89,7 +112,7 @@ function ProductPage({ products, setProducts }) {
       };
 
       try {
-        const response = await fetch('http://localhost:8080/create_product', {
+        const response = await fetch(`${BACKEND_BASE_URL}/create_product`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -111,6 +134,7 @@ function ProductPage({ products, setProducts }) {
       
         // console.log('Product created successfully:', result);
         console.log('Product created successfully:', result);
+        alert('Product added successfully!');
       } catch (error) {
         console.error('Error creating product:', error);
         alert('Failed to add the product');
@@ -118,8 +142,6 @@ function ProductPage({ products, setProducts }) {
       
     };
     reader.readAsDataURL(product.image);
-
-    alert('Product added successfully!');
     
     // Reset form or update state
     setProduct({
@@ -141,7 +163,7 @@ function ProductPage({ products, setProducts }) {
   return (
     <div>
       <h1>Product Page</h1>
-      <form onSubmit={handleFormSubmit} style={{ marginBottom: '20px' }}>
+      <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
         <input type="text" name="name" placeholder="Name" value={product.name} onChange={handleChange} required />
         
         <input type="text" name="description" placeholder="Description" value={product.description} onChange={handleChange} required />

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { BACKEND_BASE_URL } from "./constants";
 
 function ProductDetailPage() {
   const { productId } = useParams();
@@ -13,7 +14,7 @@ function ProductDetailPage() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/product/${productId}`);
+        const response = await fetch(`${BACKEND_BASE_URL}/product/${productId}`);
         if (!response.ok) {
           throw new Error("Product not found");
         }
@@ -54,7 +55,7 @@ function ProductDetailPage() {
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/product/${productId}`, {
+      const response = await fetch(`${BACKEND_BASE_URL}/product/${productId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

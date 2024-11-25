@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { checkLoginStatus, get_user_info, redirectTo } from './services/authService';
 import ReactStars from 'react-stars';
+import { BACKEND_BASE_URL, FRONTEND_BASE_URL } from './constants';
 
 function Review() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const { productId } = useParams();
 
@@ -23,8 +25,8 @@ function Review() {
       console.log(userInfo);
       setSellerId(userInfo.id); // Assign this to a product or something else
     } else {
-      console.log('User not logged in. Redirecting...');
-        redirectTo('/authorize');
+        console.log('User not logged in. Redirecting...');
+        redirectTo(`/authorize?next=${FRONTEND_BASE_URL}${location.pathname}`);
     }
   };
 
@@ -34,7 +36,7 @@ function Review() {
     const fetchReviews = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8080/reviews/product/${productId}`);
+        const response = await fetch(`${BACKEND_BASE_URL}/reviews/product/${productId}`);
         if (!response.ok) {
           throw new Error('Failed to fetch reviews');
         }
@@ -59,7 +61,7 @@ function Review() {
           rating , 
           product_id: productId, 
           reviewer_id: sellerId};
-        const response = await fetch(`http://localhost:8080/create_review`, {
+        const response = await fetch(`${BACKEND_BASE_URL}/create_review`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(newReview),
@@ -80,6 +82,7 @@ function Review() {
         };
 
         setReviews([...reviews, createdReview]); // Add the new review to the list
+        alert('Review created successfully!');
         setReviewText(''); // Clear input fields
         setRating(0);
       } catch (err) {
