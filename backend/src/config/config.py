@@ -8,3 +8,7 @@ class Config:
   SQLALCHEMY_DATABASE_URI = 'sqlite:///sports_marketplace.db'
   SQLALCHEMY_TRACK_MODIFICATIONS = False
   # JWT_SECRET_KEY = 'your_jwt_secret_key'
+class TestingConfig(Config):
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"  # Use an in-memory database for testing
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
