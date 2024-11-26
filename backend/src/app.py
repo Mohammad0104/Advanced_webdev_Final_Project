@@ -1,5 +1,5 @@
 from flask import Flask
-from models import db
+from extensions import db  # Import the single SQLAlchemy instance
 from config.config import Config
 from flask_migrate import Migrate
 from flask_cors import CORS
@@ -14,15 +14,12 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    # Initialize extensions
-    db.init_app(app)
+    db.init_app(app)  # Initialize the db instance with the app
     Migrate(app, db)
     CORS(app, supports_credentials=True)
 
-    # Import models here to avoid circular imports
     with app.app_context():
-        from models.user import User  # Import your models explicitly
-        from models.product import Product  # Example model import
+        from models.user import User  # Import models here
         db.create_all()
 
     # Register Blueprints

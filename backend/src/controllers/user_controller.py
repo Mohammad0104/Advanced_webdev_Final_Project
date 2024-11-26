@@ -2,74 +2,88 @@ from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from services.user_service import get_user_by_id, get_user_by_email, create_user, update_name
 from models.user import User
-
-# Create a Flask Blueprint named 'user'. This modularizes the routes related to user operations.
+from extensions import db
+from services.user_service import get_user_by_id
+# Create a Flask Blueprint for user-related routes
 user_blueprint = Blueprint('user', __name__)
 
 @user_blueprint.route('/users/<int:user_id>', methods=['GET'])
 def get_user(user_id):
-    # Fetch a user by their ID
+    """Fetch a user by their ID."""
     user = get_user_by_id(user_id)
     if user:
-        # If the user is found, serialize their data and return it with a 200 OK status
-        return jsonify(user.serialize()), 200
+        # Use to_dict for serialization
+        return jsonify(user.to_dict()), 200
     else:
-        # If the user is not found, return an error message with a 404 NOT FOUND status
-        return jsonify({'message': 'User not found'}), 404
+        return jsonify({'error': 'User not found'}), 404
 
 @user_blueprint.route('/users/register', methods=['POST'])
 def register_user():
-    # Extract data from the incoming request
+    """Register a new user."""
     data = request.get_json()
+
+    # Validate required fields
+    if not data.get('name') or not data.get('email') or not data.get('password'):
+        return jsonify({'error': 'Name, email, and password are required'}), 400
+
     # Check if a user with the same email already exists
     if get_user_by_email(data['email']):
-        return jsonify({'message': 'Email already exists'}), 409
-    # Generate a hashed password for security
-    hashed_password = generate_password_hash(data['password'])
+        return jsonify({'error': 'Email already exists'}), 409
+
     try:
-        # Attempt to create a new user with the provided data
+        # Use the create_user service to add a new user
         new_user = create_user(
             name=data['name'],
             email=data['email'],
             profile_pic_url=data.get('profile_pic_url', ''),
-            password=hashed_password
+            password=data['password']  # Raw password; will be hashed by the model
         )
-        # If successful, serialize the new user's data and return it with a 201 CREATED status
-        return jsonify(new_user.serialize()), 201
+        return jsonify(new_user.to_dict()), 201
     except Exception as e:
-        # If an error occurs, return an error message with a 500 INTERNAL SERVER ERROR status
         return jsonify({'error': 'Failed to create user', 'details': str(e)}), 500
+
 
 @user_blueprint.route('/users/login', methods=['POST'])
 def login_user():
-    # Extract data from the incoming request
+    """Login an existing user."""
     data = request.get_json()
-    # Retrieve the user by email
     user = get_user_by_email(data['email'])
-    # Check if the user exists and the password matches
-    if user and check_password_hash(user.password, data['password']):
-        # If successful, serialize the user's data and return it with a message
-        return jsonify({'message': 'Login successful', 'user': user.serialize()}), 200
-    else:
-        # If the login fails, return an invalid credentials message with a 401 UNAUTHORIZED status
-        return jsonify({'message': 'Invalid email or password'}), 401
 
+    if user and check_password_hash(user.password_hash, data['password']):
+        return jsonify({'message': 'Login successful', 'user': user.to_dict()}), 200
+    else:
+        return jsonify({'message': 'Invalid email or password'}), 401
 @user_blueprint.route('/users/<int:user_id>', methods=['PUT'])
 def update_user_name(user_id):
-    # Extract new name from the request data
+    """Update a user's name by their ID."""
     data = request.get_json()
-    # Call the service to update the user's name
-    response = update_name(user_id, data['new_name'])
-    return response
+
+    # Validate input
+    new_name = data.get('new_name')
+    if not new_name:
+        return jsonify({'error': 'New name is required'}), 400
+
+    user = get_user_by_id(user_id)
+
+    if not user:
+        return jsonify({'error': 'User with the specified ID not found.'}), 404
+
+    try:
+        # Update the user's name
+        user.name = new_name
+        db.session.commit()  # Ensure db is properly committed
+        return jsonify({'message': f"User's name updated successfully to: {new_name}"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': 'Failed to update user name', 'details': str(e)}), 500
+
 
 @user_blueprint.route('/users/email/<email>', methods=['GET'])
 def get_user_by_email_route(email):
-    # Fetch a user by their email
+    """Fetch a user by their email."""
     user = get_user_by_email(email)
 
     if user:
-        # If the user is found, serialize their data and return it with a 200 OK status
         return jsonify(user.to_dict()), 200
     else:
-        # If no user is found, return an error message with a 404 NOT FOUND status
-        return jsonify({'message': 'User not found'}), 404
+        return jsonify({'error': 'User not found'}), 404
