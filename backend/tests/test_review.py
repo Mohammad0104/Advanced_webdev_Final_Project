@@ -129,5 +129,5 @@ def test_delete_review_invalid_id(test_client):
     """
     response = test_client.delete('/reviews/9999')  # Non-existent review ID
     assert response.status_code == 404
-    data = response.get_json()
+    data = response.get_json() #j
     assert data['message'] == 'Review not found'
