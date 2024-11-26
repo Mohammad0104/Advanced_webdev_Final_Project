@@ -7,6 +7,8 @@ from controllers.product_controller import product_bp
 from controllers.user_controller import user_blueprint
 from controllers.review_controller import review_blueprint
 from controllers.order_controller import order_bp
+from controllers.cart_controller import cart_bp
+from controllers.cart_item_controller import cart_item_bp
 from flask_migrate import Migrate
 from flask_cors import CORS
 # from flask_talisman import Talisman
@@ -15,7 +17,14 @@ def create_app():
   app = Flask(__name__)
   app.config.from_object(Config)
   
-  CORS(app, supports_credentials=True)  # Allow requests from the frontend
+  CORS(app, supports_credentials=True, origins=['http://localhost:3000'], debug=True)
+  CORS(oauth_bp)
+  CORS(product_bp)
+  CORS(user_blueprint)
+  CORS(review_blueprint)
+  CORS(order_bp)
+  CORS(cart_bp)
+  CORS(cart_item_bp)
   
   # Talisman(app, force_https=True)
   
@@ -31,6 +40,9 @@ def create_app():
   app.register_blueprint(user_blueprint)
   app.register_blueprint(review_blueprint)
   app.register_blueprint(order_bp)
+  app.register_blueprint(cart_bp)
+  app.register_blueprint(cart_item_bp)
+
   
   with app.app_context():
     if not app.config.get('TESTING', False):

@@ -70,3 +70,6 @@ coverage.xml
 build/
 dist/
 *.egg-info/
+
+
+flask_session/

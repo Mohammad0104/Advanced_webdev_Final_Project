@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from .services.cart_service import CartService
+from services.cart_service import CartService
 
 # Define a Blueprint for cart routes
 cart_bp = Blueprint('cart', __name__)
@@ -21,7 +21,12 @@ def get_cart(user_id):
             'id': cart.id,
             'user_id': cart.user_id,
             'subtotal': cart.subtotal,
-            'icon_urls': cart.icon_urls
+            'items': [{
+                'product_id': item.product_id,
+                'quantity': item.quantity,
+                'product_name': item.product.name,
+                'product_price': item.product.price
+        } for item in cart.items]
         }), 200
     return jsonify({'error': 'Cart not found'}), 404
 
@@ -31,7 +36,7 @@ def create_cart():
     Endpoint to create a new cart.
     
     Request Body:
-        JSON object with 'user_id', 'subtotal' (optional), and 'icon_urls' (optional).
+        JSON object with 'user_id', 'subtotal' (optional)
     
     Returns:
         JSON response: Newly created cart details.
@@ -39,14 +44,12 @@ def create_cart():
     data = request.get_json()
     user_id = data.get('user_id')
     subtotal = data.get('subtotal', 0.0)
-    icon_urls = data.get('icon_urls', "")
     
-    cart = CartService.create_cart(user_id, subtotal, icon_urls)
+    cart = CartService.create_cart(user_id, subtotal)
     return jsonify({
         'id': cart.id,
         'user_id': cart.user_id,
         'subtotal': cart.subtotal,
-        'icon_urls': cart.icon_urls
     }), 201
 
 @cart_bp.route('/cart/<int:cart_id>', methods=['PUT'])
@@ -58,22 +61,20 @@ def update_cart(cart_id):
         cart_id (int): ID of the cart to update.
     
     Request Body:
-        JSON object with 'subtotal' and/or 'icon_urls'.
+        JSON object with 'subtotal'
     
     Returns:
         JSON response: Updated cart details if successful, otherwise error message.
     """
     data = request.get_json()
     subtotal = data.get('subtotal')
-    icon_urls = data.get('icon_urls')
     
-    cart = CartService.update_cart(cart_id, subtotal, icon_urls)
+    cart = CartService.update_cart(cart_id, subtotal)
     if cart:
         return jsonify({
             'id': cart.id,
             'user_id': cart.user_id,
             'subtotal': cart.subtotal,
-            'icon_urls': cart.icon_urls
         }), 200
     return jsonify({'error': 'Cart not found'}), 404
 

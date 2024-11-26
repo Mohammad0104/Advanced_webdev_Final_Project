@@ -1,6 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { FRONTEND_BASE_URL, BACKEND_BASE_URL } from './constants';
+import { checkLoginStatus, get_user_info, redirectTo } from './services/authService';
 
 function CartPage({ cart }) {
+  // const [cart, setCart] = useState([]);
+  const [localCart, setLocalCart] = useState(cart || []);
   const [showForm, setShowForm] = useState(false);
   const [userInfo, setUserInfo] = useState({
     name: '',
@@ -8,11 +13,62 @@ function CartPage({ cart }) {
     deliveryDate: '',
   });
 
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userData, setUserData] = useState(null);
+  useEffect(() => {
+    const checkStatus = async () => {
+      const loginStatus = await checkLoginStatus(navigate);
+      if (loginStatus) {
+        setIsLoggedIn(true);
+        const userInfo = await get_user_info();
+        console.log(userInfo);
+        setUserData(userInfo);
+      } else {
+        setIsLoggedIn(false);
+        redirectTo(`/authorize?next=${FRONTEND_BASE_URL}${location.pathname}`);
+      }
+    };
+  
+    checkStatus();
+  }, [navigate, location.pathname]);
+  
+  useEffect(() => {
+    if (userData) {
+      const fetchCart = async () => {
+        try {
+          const response = await fetch(`${BACKEND_BASE_URL}/cart/${userData.id}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+  
+          if (response.ok) {
+            const cartData = await response.json();
+            console.log(cartData);
+            setLocalCart(cartData.items); // Update the local state
+            console.log(localCart);
+            // cart = cartData.items || []; // Update cart state
+          } else {
+            console.error('Failed to fetch cart:', response.statusText);
+          }
+        } catch (error) {
+          console.error('Error fetching cart:', error);
+        }
+      };
+  
+      fetchCart();
+    }
+  }, [userData]); // Only run getCart when userData is updated
+  
   // Calculate the subtotal
-  const subtotal = cart.reduce((acc, item) => acc + parseFloat(item.price || 0), 0);
+  const subtotal = localCart.reduce((acc, item) => acc + parseFloat(item.product_price || 0) * item.quantity, 0);
+  // const subtotal = cart.reduce((acc, item) => acc + parseFloat(item.price || 0), 0);
 
   const handleBuyNow = () => {
-    if (cart.length === 0) {
+    if (localCart.length === 0) {
       alert("Your cart is empty. Add some products first!");
     } else {
       setShowForm(true); // Show the form when "Buy Now" is clicked
@@ -33,11 +89,11 @@ function CartPage({ cart }) {
   return (
     <div>
       <h1>Your Cart</h1>
-      {cart.length === 0 ? (
+      {localCart.length === 0 ? (
         <p>Your cart is empty.</p>
       ) : (
         <div>
-          {cart.map((item, index) => (
+          {localCart.map((item, index) => (
             <div
               key={index}
               style={{
@@ -47,12 +103,14 @@ function CartPage({ cart }) {
                 borderRadius: '5px',
               }}
             >
-              <p><strong>Name:</strong> {item.name}</p>
-              <p><strong>Condition:</strong> {item.condition}</p>
-              <p><strong>Price:</strong> {item.price}</p>
+              <p><strong>{item.product_name}</strong></p>
+              <p>${(item.product_price ?? 0).toFixed(2)} each</p>
+              <p><strong>Quantity:</strong> {item.quantity}</p>
             </div>
           ))}
-          <p><strong>Subtotal:</strong> ${subtotal.toFixed(2)}</p>
+          <p>
+            <strong>Subtotal:</strong> ${subtotal.toFixed(2)}
+          </p>
           <button
             onClick={handleBuyNow}
             style={{

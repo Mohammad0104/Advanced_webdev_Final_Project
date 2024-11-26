@@ -1,14 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { BACKEND_BASE_URL } from './constants';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { BACKEND_BASE_URL, FRONTEND_BASE_URL } from './constants';
+import { checkLoginStatus, get_user_info, redirectTo } from './services/authService';
 
 function ProductListPage({ setCart }) {
   const [products, setProducts] = useState([]); // Initial state as an empty array
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userData, setUserData] = useState(null);
+
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
+    const checkStatus = async () => {
+      const loginStatus = await checkLoginStatus(navigate);
+      if (loginStatus) {
+        setIsLoggedIn(true);
+        const userInfo = await get_user_info();
+        console.log(userInfo);
+        setUserData(userInfo);
+
+      } else {
+        setIsLoggedIn(false);
+        redirectTo(`/authorize?next=${FRONTEND_BASE_URL}${location.pathname}`);
+      }
+    };
+
     const fetchProducts = async () => {
       try {
         const response = await fetch(`${BACKEND_BASE_URL}/products`);
@@ -31,14 +50,42 @@ function ProductListPage({ setCart }) {
         setLoading(false);
       }
     };
-
+    checkStatus();
     fetchProducts();
   }, []); // Run once when the component mounts
 
-  const handleBuy = (product) => {
-    setCart((prevCart) => [...prevCart, product]);
-    navigate('/cart');
-  };
+  const handleBuy = async (product) => {
+    console.log(product);
+
+    const payload = {
+      product_id: product.id,
+      quantity: 1
+    }
+
+    try {
+        const response = await fetch(`${BACKEND_BASE_URL}/cart/${userData.id}/add`, {
+            method: 'POST',
+            body: JSON.stringify(payload),
+            headers: {
+              'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+        console.log("Cart updated:", data);
+
+        // Assuming the cart needs to be updated in the state
+        setCart((prevCart) => [...prevCart, product]);
+
+        // Navigate to the cart page
+        navigate('/cart');
+    } catch (error) {
+        console.error("Error updating cart:", error);
+    }
+};
+
+
+
 
   if (loading) {
     return <p style={{ textAlign: 'center' }}>Loading products...</p>;
