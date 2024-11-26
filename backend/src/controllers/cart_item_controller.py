@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from services.cart_item_service import CartItemService
+from models.cart import Cart
 
 # Define a Blueprint for cart item routes
 cart_item_bp = Blueprint('cart_item', __name__)
@@ -53,11 +54,22 @@ def remove_from_cart(cart_id):
     """
     data = request.get_json()
     cart_item_id = data.get('cart_item_id')
+    print(data)
+
+    cart = Cart.query.filter_by(id=cart_id).first()
 
     # Remove the item from the cart using CartItemService
     success = CartItemService.remove_item_from_cart(cart_id, cart_item_id)
     
     if success:
-        return jsonify({"message": "Item removed successfully"}), 200
+        return jsonify({"message": "Item removed successfully", 
+                        'id': cart_id,
+                        'subtotal': cart.subtotal,
+                        'items': [{
+                            'product_id': item.product_id,
+                            'quantity': item.quantity,
+                            'product_name': item.product.name,
+                            'product_price': item.product.price
+                        } for item in cart.items]}), 200
     else:
         return jsonify({"error": "Item not found"}), 404

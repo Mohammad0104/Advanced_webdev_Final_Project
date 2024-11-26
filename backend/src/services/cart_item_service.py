@@ -1,4 +1,5 @@
 from models.cart_item import CartItem, db
+from models.cart import Cart
 from services.cart_service import CartService
 
 class CartItemService:
@@ -29,12 +30,40 @@ class CartItemService:
 
     @staticmethod
     def remove_item_from_cart(cart_id, cart_item_id):
-        # Step 1: Find the cart item to remove
-        cart_item = CartItem.query.filter_by(id=cart_item_id, cart_id=cart_id).first()
+        cart_item = CartItem.query.filter_by(id=cart_item_id).first()
         if cart_item:
+            # Step 2: Delete the cart item from the database
             db.session.delete(cart_item)
-            db.session.comm
+            db.session.commit()
+
+            # Step 3: Recalculate the cart's subtotal after removal
+            cart = Cart.query.get(cart_id)
+            if cart:
+                # Recalculate the subtotal by summing up the product of quantity and price for each item
+                cart.subtotal = sum(item.quantity * item.product.price for item in cart.items)
+                db.session.commit()  # Commit the subtotal update
+
+            return cart  # Return the updated cart object
+
+        return None  # If the cart item is not found
             
+    @staticmethod
+    def update_item_and_cart(cart, item_id, new_quantity):
+        
+        cart_item = next((item for item in cart.items if item.id == item_id), None)
+        if not cart_item:
+            raise ValueError(f"Cart item with ID {item_id} not found.")
+        
+        # Update the quantity of the cart item
+        cart_item.quantity = new_quantity
+        
+        # Recalculate the subtotal by summing up the product of quantity and price for each item
+        cart.subtotal = sum(item.quantity * item.product.price for item in cart.items)
+
+        # Commit the changes to the database
+        db.session.add(cart)
+        db.session.commit()
+        
     @staticmethod
     def _update_cart_subtotal(cart):
         # Calculate the subtotal by summing up the product of quantity and price for each item

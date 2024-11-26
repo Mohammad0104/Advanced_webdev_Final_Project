@@ -4,8 +4,8 @@ import { FRONTEND_BASE_URL, BACKEND_BASE_URL } from './constants';
 import { checkLoginStatus, get_user_info, redirectTo } from './services/authService';
 
 function CartPage({ cart }) {
-  // const [cart, setCart] = useState([]);
   const [localCart, setLocalCart] = useState(cart || []);
+  const [cartId, setCardId] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [userInfo, setUserInfo] = useState({
     name: '',
@@ -17,23 +17,23 @@ function CartPage({ cart }) {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
+
   useEffect(() => {
     const checkStatus = async () => {
       const loginStatus = await checkLoginStatus(navigate);
       if (loginStatus) {
         setIsLoggedIn(true);
         const userInfo = await get_user_info();
-        console.log(userInfo);
         setUserData(userInfo);
       } else {
         setIsLoggedIn(false);
         redirectTo(`/authorize?next=${FRONTEND_BASE_URL}${location.pathname}`);
       }
     };
-  
+
     checkStatus();
   }, [navigate, location.pathname]);
-  
+
   useEffect(() => {
     if (userData) {
       const fetchCart = async () => {
@@ -44,13 +44,12 @@ function CartPage({ cart }) {
               'Content-Type': 'application/json',
             },
           });
-  
+
           if (response.ok) {
             const cartData = await response.json();
             console.log(cartData);
-            setLocalCart(cartData.items); // Update the local state
-            console.log(localCart);
-            // cart = cartData.items || []; // Update cart state
+            setLocalCart(cartData.items);
+            setCardId(cartData.id)
           } else {
             console.error('Failed to fetch cart:', response.statusText);
           }
@@ -58,20 +57,82 @@ function CartPage({ cart }) {
           console.error('Error fetching cart:', error);
         }
       };
-  
+
       fetchCart();
     }
-  }, [userData]); // Only run getCart when userData is updated
-  
-  // Calculate the subtotal
-  const subtotal = localCart.reduce((acc, item) => acc + parseFloat(item.product_price || 0) * item.quantity, 0);
-  // const subtotal = cart.reduce((acc, item) => acc + parseFloat(item.price || 0), 0);
+  }, [userData]);
+
+  let subtotal = 0;
+  if (localCart) {
+    subtotal = localCart.reduce((acc, item) => acc + parseFloat(item.product_price || 0) * item.quantity, 0);
+  }
+
+  // Function to update quantity
+  const updateQuantityInDB = async (itemId, newQuantity) => {
+    try {
+      const response = await fetch(`${BACKEND_BASE_URL}/cart/${cartId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          product_id: itemId,
+          quantity: newQuantity,
+          subtotal: subtotal
+        }),
+      });
+      if (response.ok) {
+        const updatedCart = await response.json();
+        console.log(updatedCart);
+        setLocalCart(updatedCart.items);
+      } else {
+        console.error('Failed to update quantity:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error updating quantity:', error);
+    }
+  };
+
+  const handleQuantityChange = (itemId, change) => {
+    const item = localCart.find(item => item.product_id === itemId);
+    const newQuantity = Math.max(item.quantity + change, 1); // Ensure quantity is at least 1
+    updateQuantityInDB(itemId, newQuantity);
+  };
+
+  // Function to remove item from cart
+  const removeItemFromDB = async (itemId) => {
+    try {
+      const response = await fetch(`${BACKEND_BASE_URL}/cart/${cartId}/remove`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          cart_item_id: itemId,
+        }),
+      });
+      if (response.ok) {
+        const updatedCart = await response.json();
+        console.log(updatedCart);
+        setLocalCart(updatedCart.items);
+        alert('Product(s) removed from cart successfully');
+      } else {
+        console.error('Failed to remove item:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error removing item:', error);
+    }
+  };
+
+  const handleRemoveItem = (itemId) => {
+    removeItemFromDB(itemId);
+  };
 
   const handleBuyNow = () => {
     if (localCart.length === 0) {
       alert("Your cart is empty. Add some products first!");
     } else {
-      setShowForm(true); // Show the form when "Buy Now" is clicked
+      setShowForm(true);
     }
   };
 
@@ -83,7 +144,6 @@ function CartPage({ cart }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     alert(`Order placed successfully!\nName: ${userInfo.name}\nAddress: ${userInfo.address}\nDelivery Date: ${userInfo.deliveryDate}\nSubtotal: $${subtotal.toFixed(2)}`);
-    // You can add logic here to process the order and clear the cart
   };
 
   return (
@@ -101,16 +161,45 @@ function CartPage({ cart }) {
                 padding: '10px',
                 marginBottom: '10px',
                 borderRadius: '5px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '100%',
+                maxWidth: '877px'
               }}
             >
-              <p><strong>{item.product_name}</strong></p>
-              <p>${(item.product_price ?? 0).toFixed(2)} each</p>
-              <p><strong>Quantity:</strong> {item.quantity}</p>
+              <div style={{ marginLeft: '11%', width: '80%'}}>
+                <p><strong>{item.product_name}</strong></p>
+                <p>${(item.product_price ?? 0).toFixed(2)} each</p>
+                <p><strong>Quantity:</strong> 
+                  <button 
+                    onClick={() => handleQuantityChange(item.product_id, -1)} 
+                    style={{ margin: '0 10px', padding: '8px', cursor: 'pointer', fontWeight: 'bold' }}
+                    disabled={item.quantity <= 1}
+                  >
+                    -
+                  </button>
+                  {item.quantity}
+                  <button 
+                    onClick={() => handleQuantityChange(item.product_id, 1)} 
+                    style={{ margin: '0 10px', padding: '8px', cursor: 'pointer', fontWeight: 'bold' }}
+                  >
+                    +
+                  </button>
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', marginLeft: '10px', marginRight: '5%' }}>
+                <button 
+                  onClick={() => handleRemoveItem(item.product_id)} 
+                  style={{ background: 'red', color: 'white', padding: '10px 15px 10px 15px', borderRadius: '50%', cursor: 'pointer', fontSize: 'x-large' }}
+                >
+                  X
+                </button>
+              </div>
             </div>
           ))}
-          <p>
-            <strong>Subtotal:</strong> ${subtotal.toFixed(2)}
-          </p>
+          <p><strong>Subtotal:</strong> ${subtotal.toFixed(2)}</p>
           <button
             onClick={handleBuyNow}
             style={{
@@ -170,10 +259,9 @@ function CartPage({ cart }) {
               </button>
             </form>
           )}
-        </div>
+      </div>
       )}
     </div>
   );
 }
-
 export default CartPage;

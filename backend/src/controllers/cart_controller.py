@@ -1,5 +1,7 @@
 from flask import Blueprint, request, jsonify
 from services.cart_service import CartService
+from services.cart_item_service import CartItemService
+from models.cart import Cart, db
 
 # Define a Blueprint for cart routes
 cart_bp = Blueprint('cart', __name__)
@@ -52,31 +54,76 @@ def create_cart():
         'subtotal': cart.subtotal,
     }), 201
 
+# @cart_bp.route('/cart/<int:cart_id>', methods=['PUT'])
+# def update_cart(cart_id):
+#     """
+#     Endpoint to update an existing cart's subtotal and/or icon URLs.
+    
+#     Args:
+#         cart_id (int): ID of the cart to update.
+    
+#     Request Body:
+#         JSON object with 'subtotal'
+    
+#     Returns:
+#         JSON response: Updated cart details if successful, otherwise error message.
+#     """
+#     data = request.get_json()
+#     subtotal = data.get('subtotal')
+    
+#     cart = CartService.update_cart(cart_id, subtotal)
+#     if cart:
+#         return jsonify({
+#             'id': cart.id,
+#             'user_id': cart.user_id,
+#             'subtotal': cart.subtotal,
+#         }), 200
+#     return jsonify({'error': 'Cart not found'}), 404
+
 @cart_bp.route('/cart/<int:cart_id>', methods=['PUT'])
 def update_cart(cart_id):
     """
-    Endpoint to update an existing cart's subtotal and/or icon URLs.
+    Endpoint to update an existing cart's subtotal and cart item quantities.
     
     Args:
         cart_id (int): ID of the cart to update.
     
     Request Body:
-        JSON object with 'subtotal'
+        JSON object with 'subtotal' and 'quantity' for a specific cart item.
     
     Returns:
         JSON response: Updated cart details if successful, otherwise error message.
     """
     data = request.get_json()
-    subtotal = data.get('subtotal')
+    product_id = data.get('product_id')  # Cart item ID
+    quantity = data.get('quantity')
+
+    if product_id is None or quantity is None:
+        return jsonify({'error': 'Item ID and quantity are required'}), 400
     
-    cart = CartService.update_cart(cart_id, subtotal)
-    if cart:
+    # Find the cart
+    cart = Cart.query.get(cart_id)
+    if not cart:
+        return jsonify({'error': 'Cart not found'}), 404
+
+    # Call the CartService to update the item and recalculate the subtotal
+    try:
+        CartItemService.update_item_and_cart(cart, product_id, quantity)
+        
         return jsonify({
             'id': cart.id,
-            'user_id': cart.user_id,
             'subtotal': cart.subtotal,
+            'items': [{
+                'product_id': item.product_id,
+                'quantity': item.quantity,
+                'product_name': item.product.name,
+                'product_price': item.product.price
+            } for item in cart.items]
         }), 200
-    return jsonify({'error': 'Cart not found'}), 404
+
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 404
+
 
 @cart_bp.route('/cart/<int:cart_id>', methods=['DELETE'])
 def delete_cart(cart_id):
