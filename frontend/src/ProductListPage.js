@@ -78,7 +78,8 @@ function ProductListPage({ setCart }) {
         setCart((prevCart) => [...prevCart, product]);
 
         // Navigate to the cart page
-        navigate('/cart');
+        alert(`1 ${product.name} added to cart`)
+        // navigate('/cart');
     } catch (error) {
         console.error("Error updating cart:", error);
     }
@@ -167,7 +168,7 @@ function ProductListPage({ setCart }) {
                 marginRight: 'auto',
               }}
             >
-              Buy
+              Add to Cart
             </button>
             <Link
               to={`/product/${prod.id}`}

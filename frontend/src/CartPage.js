@@ -123,7 +123,7 @@ function CartPage({ cart }) {
               marginTop: '20px',
             }}
           >
-            Buy Now
+            Proceed to Checkout
           </button>
 
           {showForm && (
