@@ -1,8 +1,9 @@
 # Advanced Web Dev Final Project
+# Group Information
 
-#Group Info:
-Name:Anthony Liscio 
-Name:.Mohammad(100755461)
+- **Anthony Liscio**
+- **Mohammad (100755461)**
+
 
 ## Instructions:
 - Open 2 terminals (windows command line)
