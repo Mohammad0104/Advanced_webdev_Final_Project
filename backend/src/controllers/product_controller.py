@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime
 from services import product_service
+from flask_cors import cross_origin
 import base64
 
 from services.auth import login_required
@@ -10,6 +11,7 @@ product_bp = Blueprint('product_bp', __name__)
 
 # Create a new product
 @product_bp.route('/create_product', methods=['POST'])
+@cross_origin()
 def create_new_product():
     try:
         data = request.get_json()
@@ -64,6 +66,7 @@ def create_new_product():
 
 # Get all products
 @product_bp.route('/products', methods=['GET'])
+@cross_origin()
 def get_products():
     try:
         products = product_service.get_all_products()
@@ -84,6 +87,7 @@ def get_products():
 
 # Get a specific product by ID
 @product_bp.route('/product/<int:product_id>', methods=['GET'])
+@cross_origin()
 def get_product(product_id):
     try:
         product = product_service.get_product_by_id(product_id)
@@ -104,6 +108,7 @@ def get_product(product_id):
 
 # Update a product
 @product_bp.route('/product/<int:product_id>', methods=['PUT'])
+@cross_origin()
 def update_product(product_id):
     try:
         data = request.get_json()

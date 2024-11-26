@@ -1,4 +1,5 @@
 from flask import Blueprint, redirect, request, session, jsonify, url_for
+from flask_cors import cross_origin
 from services.auth import login_required
 from services.oauth.oauth_service import OAuthService
 import requests
@@ -12,12 +13,14 @@ oauth_bp = Blueprint('oauth_bp', __name__)
 oauth_service = OAuthService()
 
 @oauth_bp.route('/')
+@cross_origin()
 def index():
     # options table (will be changed later.  For now the focus is on "Test the authentication flow directly")
     return print_index_table()
 
 # log in page
 @oauth_bp.route('/authorize')
+@cross_origin()
 def authorize():
     """Starts the OAuth 2.0 authorization flow (the login page)
 
@@ -31,6 +34,7 @@ def authorize():
     return redirect(authorization_url)
 
 @oauth_bp.route('/oauth2callback')
+@cross_origin()
 def oauth2callback():
     """Handles OAuth 2.0 callnack from the authorization server
 
@@ -90,6 +94,7 @@ def oauth2callback():
 
 
 @oauth_bp.route('/user_info')
+@cross_origin()
 @login_required
 def user_info():
     """Get and display user information.  To be used after authentication
@@ -119,6 +124,7 @@ def user_info():
     return jsonify(user_info)
 
 @oauth_bp.route('/logout', methods=['POST'])
+@cross_origin()
 def logout():
     try:
         # # Revoke the OAuth token if necessary (optional)
@@ -142,6 +148,7 @@ def logout():
         return jsonify({"error": "Logout failed"}), 500
 
 @oauth_bp.route('/revoke')
+@cross_origin()
 def revoke():
     """Revoke OAuth 2.0 credentials and log out the user
 
@@ -169,6 +176,7 @@ def revoke():
         return 'An error occurred.<br><br>' + print_index_table() # if failed
 
 @oauth_bp.route('/clear')
+@cross_origin()
 def clear_credentials():
     """Clear the credentials from the session
 
@@ -184,12 +192,14 @@ def clear_credentials():
 
 
 @oauth_bp.route('/check_login_status', methods=['GET'])
+@cross_origin()
 def check_login():
     is_logged_in = 'credentials' in session
     return jsonify({'logged_in': is_logged_in})
     #return session['credentials'] != None
 
 # to be changed later (from default google example)
+@cross_origin()
 def print_index_table():
     return ('<table>'
             '<tr><td><a href="/test">Test an API request</a></td>'

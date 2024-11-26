@@ -17,14 +17,15 @@ def create_app():
   app = Flask(__name__)
   app.config.from_object(Config)
   
-  CORS(app, supports_credentials=True, origins=['http://localhost:3000'], debug=True)
-  CORS(oauth_bp)
-  CORS(product_bp)
-  CORS(user_blueprint)
-  CORS(review_blueprint)
-  CORS(order_bp)
-  CORS(cart_bp)
-  CORS(cart_item_bp)
+  CORS(app, resources={r"/*": {"origins": "*"}})
+  # CORS(app, supports_credentials=True, origins=['http://localhost:3000'], debug=True)
+  # CORS(oauth_bp)
+  # CORS(product_bp)
+  # CORS(user_blueprint)
+  # CORS(review_blueprint)
+  # CORS(order_bp)
+  # CORS(cart_bp)
+  # CORS(cart_item_bp)
   
   # Talisman(app, force_https=True)
   
