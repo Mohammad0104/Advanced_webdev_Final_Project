@@ -23,6 +23,7 @@ migrations/
 # Environment variables files
 .env
 .env.*
+*.env
 
 # Logs
 *.log

@@ -9,6 +9,7 @@ from controllers.review_controller import review_blueprint
 from controllers.order_controller import order_bp
 from controllers.cart_controller import cart_bp
 from controllers.cart_item_controller import cart_item_bp
+from controllers.payment_controller import payment_bp
 from flask_migrate import Migrate
 from flask_cors import CORS
 # from flask_talisman import Talisman
@@ -43,6 +44,7 @@ def create_app():
   app.register_blueprint(order_bp)
   app.register_blueprint(cart_bp)
   app.register_blueprint(cart_item_bp)
+  app.register_blueprint(payment_bp)
 
   
   with app.app_context():

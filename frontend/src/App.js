@@ -9,6 +9,9 @@ import CartPage from './CartPage';
 import ProfilePage from './ProfilePage';
 import Review from './Review';
 import ProductDetailPage from './ProductDetailPage';
+import PaymentPage from './PaymentPage';
+import OrdersPage from './OrdersPage';
+import PaymentSuccessPage from './PaymentSuccessPage';
 
 function App() {
   const [products, setProducts] = useState([]);
@@ -37,6 +40,9 @@ function App() {
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/reviews/product/:productId" element={<Review />} />
             <Route path="/product/:productId" element={<ProductDetailPage />} />
+            <Route path='/paymentpage' element={<PaymentPage />} />
+            <Route path="/payment-success" element={<PaymentSuccessPage />} />
+            <Route path="/orders/:userId" element={<OrdersPage />} />
           </Routes>
         </div>
       </div>
