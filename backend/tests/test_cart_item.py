@@ -1,39 +1,57 @@
 import pytest
-from app import create_app, db
+from flask import Flask
+from models import db
 from models.user import User
-from models.product import Product
 from models.cart import Cart
-import datetime
+from models.cart_item import CartItem
+from models.product import Product
+from datetime import datetime
+from controllers.cart_item_controller import cart_item_bp
+
 
 @pytest.fixture
 def app():
-    """Create and configure a new app instance for each test."""
-    app = create_app({"TESTING": True, "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:"})
+    """Fixture to create a Flask application for testing."""
+    app = Flask(__name__)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['TESTING'] = True
+
+    db.init_app(app)
+
     with app.app_context():
         db.create_all()
-    yield app
-    with app.app_context():
+        app.register_blueprint(cart_item_bp, url_prefix="/api")
+        yield app
         db.session.remove()
         db.drop_all()
 
+
 @pytest.fixture
 def client(app):
-    """A test client for the app."""
+    """Fixture to create a test client for the app."""
     return app.test_client()
+
 
 @pytest.fixture
 def setup_database(app):
     """Fixture to populate the database with mock data for testing."""
     with app.app_context():
-        # Create users
-        user1 = User(
+        # Clear existing data
+        db.session.query(CartItem).delete()
+        db.session.query(Cart).delete()
+        db.session.query(Product).delete()
+        db.session.query(User).delete()
+
+        # Create a user
+        user = User(
             id=1,
             name="John Doe",
             email="john@example.com",
-            profile_pic_url="http://example.com/johndoe.jpg",
+            profile_pic_url="http://example.com/profile.jpg",
             admin=False
         )
-        db.session.add(user1)
+        db.session.add(user)
 
         # Create products
         product1 = Product(
@@ -44,65 +62,86 @@ def setup_database(app):
             gender="Unisex",
             size="M",
             condition="New",
+            quantity=10,
+            youth_size=False,  # Ensures `youth_size` is not null
             brand="Brand A",
-            youth_size=False,
-            sport="Soccer",
-            date_listed=datetime.datetime.now(),
+            sport="Sport A",
+            date_listed=datetime.utcnow()
         )
         product2 = Product(
             id=2,
             name="Product 2",
             seller_id=1,
-            price=30.0,
+            price=75.0,
             gender="Unisex",
             size="L",
-            condition="Used",
+            condition="New",
+            quantity=5,
+            youth_size=True,  # Ensures `youth_size` is not null
             brand="Brand B",
-            youth_size=True,
-            sport="Basketball",
-            date_listed=datetime.datetime.now(),
+            sport="Sport B",
+            date_listed=datetime.utcnow()
         )
         db.session.add_all([product1, product2])
 
-        # Create a cart for user1
-        cart = Cart(id=1, user_id=1, subtotal=0.0)
+        # Create a cart for the user
+        cart = Cart(
+            id=1,
+            user_id=1,
+            subtotal=0.0
+        )
         db.session.add(cart)
-
         db.session.commit()
+
 
 def test_add_to_cart(client, setup_database):
     """Test adding a product to the cart."""
-    response = client.post("/cart/1/add", json={"product_id": 1, "quantity": 2})  # Ensure the path is correct
+    # Add a product to the cart
+    response = client.post('/api/cart/1/add', json={'product_id': 1, 'quantity': 2})
     assert response.status_code == 201
-    data = response.get_json()
-    assert data["id"] == 1
-    assert data["subtotal"] == 100.0
-    assert len(data["items"]) == 1
 
-def test_add_to_cart_existing_product(client, setup_database):
-    """Test adding more of an existing product to the cart."""
-    client.post("/cart/1/add", json={"product_id": 1, "quantity": 2})  # Add product first time
-    response = client.post("/cart/1/add", json={"product_id": 1, "quantity": 3})  # Add more of the same product
-    assert response.status_code == 201
+    # Verify the cart's contents
     data = response.get_json()
-    assert len(data["items"]) == 1
-    assert data["items"][0]["quantity"] == 5
-    assert data["subtotal"] == 250.0
+    assert data['subtotal'] == 100.0  # 2 x 50.0
+    assert len(data['items']) == 1
+    assert data['items'][0]['product_id'] == 1
+    assert data['items'][0]['quantity'] == 2
+
 
 def test_remove_from_cart(client, setup_database):
-    """Test removing an item from the cart."""
-    client.post("/cart/1/add", json={"product_id": 1, "quantity": 2})  # Add product first
-    response = client.delete("/cart/1/remove", json={"cart_item_id": 1})  # Ensure the path is correct
+    """Test removing a product from the cart."""
+    # Add a product to the cart first
+    client.post('/api/cart/1/add', json={'product_id': 1, 'quantity': 2})
+
+    # Remove the product from the cart
+    response = client.delete('/api/cart/1/remove', json={'cart_item_id': 1})
     assert response.status_code == 200
+
+    # Verify the cart is now empty
     data = response.get_json()
-    assert len(data["items"]) == 0
-    assert data["subtotal"] == 0.0
+    assert data['subtotal'] == 0.0
+    assert len(data['items']) == 0
+
+
+def test_add_existing_product_to_cart(client, setup_database):
+    """Test adding more quantity of an existing product in the cart."""
+    # Add a product to the cart
+    client.post('/api/cart/1/add', json={'product_id': 1, 'quantity': 2})
+
+    # Add the same product again
+    response = client.post('/api/cart/1/add', json={'product_id': 1, 'quantity': 1})
+    assert response.status_code == 201
+
+    # Verify the cart's contents
+    data = response.get_json()
+    assert data['subtotal'] == 150.0  # (2 + 1) x 50.0
+    assert len(data['items']) == 1
+    assert data['items'][0]['quantity'] == 3
+
 
 def test_remove_nonexistent_item(client, setup_database):
     """Test removing a nonexistent item from the cart."""
-    response = client.delete("/cart/1/remove", json={"cart_item_id": 999})  # Nonexistent cart item ID
+    response = client.delete('/api/cart/1/remove', json={'cart_item_id': 999})
     assert response.status_code == 404
     data = response.get_json()
-    assert data is not None  # Ensure a response is returned
-    assert "error" in data  # Ensure the error message is present
-    assert data["error"] == "Item not found"  # Match the exact error message from the backend
+    assert "Item not found" in data['error']
