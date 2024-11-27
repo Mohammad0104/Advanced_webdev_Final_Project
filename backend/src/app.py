@@ -12,50 +12,51 @@ from controllers.cart_item_controller import cart_item_bp
 from controllers.payment_controller import payment_bp
 from flask_migrate import Migrate
 from flask_cors import CORS
-# from flask_talisman import Talisman
 
-def create_app():
-  app = Flask(__name__)
-  app.config.from_object(Config)
-  
-  CORS(app, resources={r"/*": {"origins": "*"}})
-  # CORS(app, supports_credentials=True, origins=['http://localhost:3000'], debug=True)
-  # CORS(oauth_bp)
-  # CORS(product_bp)
-  # CORS(user_blueprint)
-  # CORS(review_blueprint)
-  # CORS(order_bp)
-  # CORS(cart_bp)
-  # CORS(cart_item_bp)
-  
-  # Talisman(app, force_https=True)
-  
-  # Initialize extensions
-  db.init_app(app)
-  migrate = Migrate(app, db)
-  
-  app.secret_key = Config.SECRET_KEY
-  
-  # Register blueprints
-  app.register_blueprint(oauth_bp)
-  app.register_blueprint(product_bp)
-  app.register_blueprint(user_blueprint)
-  app.register_blueprint(review_blueprint)
-  app.register_blueprint(order_bp)
-  app.register_blueprint(cart_bp)
-  app.register_blueprint(cart_item_bp)
-  app.register_blueprint(payment_bp)
-
-  
-  with app.app_context():
-    if not app.config.get('TESTING', False):
-      db.create_all()
+def create_app(config=None):
+    app = Flask(__name__)
     
-  return app
+    # Load the configuration from the Config object or the passed config
+    app.config.from_object(Config)
+    
+    if config:
+        app.config.update(config)
+
+    # Enable CORS for all routes (you can specify origins if needed)
+    CORS(app, resources={r"/*": {"origins": "*"}})
+    # Alternatively, for restricted CORS access:
+    # CORS(app, supports_credentials=True, origins=['http://localhost:3000'], debug=True)
+    
+    # Initialize extensions
+    db.init_app(app)
+    migrate = Migrate(app, db)
+    
+    # Set secret key for sessions
+    app.secret_key = Config.SECRET_KEY
+    
+    # Register blueprints (modular routes)
+    app.register_blueprint(oauth_bp, url_prefix='/oauth')
+    app.register_blueprint(product_bp, url_prefix='/products')
+    app.register_blueprint(user_blueprint, url_prefix='/users')
+    app.register_blueprint(review_blueprint, url_prefix='/reviews')
+    app.register_blueprint(order_bp, url_prefix='/orders')
+    app.register_blueprint(cart_bp, url_prefix='/cart')
+    app.register_blueprint(cart_item_bp, url_prefix='/cart_items')
+    app.register_blueprint(payment_bp, url_prefix='/payments')
+
+    # Create all tables if not in testing mode
+    with app.app_context():
+        if not app.config.get('TESTING', False):
+            db.create_all()
+
+    return app
 
 if __name__ == '__main__':
-  app = create_app()
-  os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-  os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1' # fixes issue where scope changes (happens with the optional google drive permission)
-  app.run('localhost', 8080, debug=True)
-  # app.run(debug=True)
+    app = create_app()
+
+    # Set environment variables for OAuth configuration
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'  # Fixes issues where scope changes
+    
+    # Run the Flask app on localhost:8080 in debug mode
+    app.run(host='localhost', port=8080, debug=True)

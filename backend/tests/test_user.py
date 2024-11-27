@@ -40,7 +40,7 @@ def sample_user(app):
         admin=False,
     )
 
-    # Mock the serialize method
+    # Mock the serialize method for the sample user
     def mock_serialize(self):
         return {
             'id': self.id,
@@ -66,14 +66,14 @@ def test_register_user(client):
         'name': 'New User',
         'email': 'newuser@example.com',
         'profile_pic_url': 'https://example.com/profile_new.jpg',
-        'password': 'dummy_password',  # Include dummy password to satisfy backend
     }
 
-    # Mock the password-related operations
-    with patch("src.controllers.user_controller.generate_password_hash") as mock_hash, \
-         patch("src.controllers.user_controller.create_user") as mock_create_user:
-        mock_hash.return_value = "hashed_dummy_password"
+    # Mock the user creation process
+    with patch("src.services.user_service.create_user") as mock_create_user:
+        # Create a MagicMock object for the user
         mock_user = MagicMock()
+
+        # Mock the `serialize` method of the mock user
         mock_user.serialize.return_value = {
             'id': 1,
             'name': payload['name'],
@@ -81,6 +81,7 @@ def test_register_user(client):
             'profile_pic_url': payload['profile_pic_url'],
             'admin': False,
         }
+
         mock_create_user.return_value = mock_user
 
         response = client.post('/users/register', json=payload)
@@ -95,16 +96,22 @@ def test_login_user(client, sample_user):
     """Test logging in a user."""
     payload = {
         'email': sample_user.email,
-        'password': 'dummy_password',  # Include dummy password to satisfy backend
+        # No password needed for OAuth
     }
 
     # Mock the login-related operations
-    with patch("src.controllers.user_controller.get_user_by_email") as mock_get_user, \
-         patch("src.controllers.user_controller.check_password_hash") as mock_check:
-        # Mock a User object with a password attribute
-        sample_user.password = "hashed_dummy_password"
-        mock_get_user.return_value = sample_user
-        mock_check.return_value = True
+    with patch("src.controllers.user_controller.get_user_by_email") as mock_get_user:
+        # Mock the user object with the serialize method
+        mock_user = MagicMock()
+        mock_user.serialize.return_value = {
+            'id': sample_user.id,
+            'name': sample_user.name,
+            'email': sample_user.email,
+            'profile_pic_url': sample_user.profile_pic_url,
+            'admin': sample_user.admin
+        }
+
+        mock_get_user.return_value = mock_user
 
         response = client.post('/users/login', json=payload)
 
