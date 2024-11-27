@@ -3,7 +3,6 @@ from app import create_app, db
 from models.user import User
 from models.product import Product
 from models.cart import Cart
-from models.cart_item import CartItem
 import datetime
 
 @pytest.fixture
@@ -73,7 +72,7 @@ def setup_database(app):
 
 def test_add_to_cart(client, setup_database):
     """Test adding a product to the cart."""
-    response = client.post("/cart/1/add", json={"product_id": 1, "quantity": 2})
+    response = client.post("/cart/1/add", json={"product_id": 1, "quantity": 2})  # Ensure the path is correct
     assert response.status_code == 201
     data = response.get_json()
     assert data["id"] == 1
@@ -93,7 +92,7 @@ def test_add_to_cart_existing_product(client, setup_database):
 def test_remove_from_cart(client, setup_database):
     """Test removing an item from the cart."""
     client.post("/cart/1/add", json={"product_id": 1, "quantity": 2})  # Add product first
-    response = client.delete("/cart/1/remove", json={"cart_item_id": 1})  # Remove item
+    response = client.delete("/cart/1/remove", json={"cart_item_id": 1})  # Ensure the path is correct
     assert response.status_code == 200
     data = response.get_json()
     assert len(data["items"]) == 0
@@ -104,5 +103,6 @@ def test_remove_nonexistent_item(client, setup_database):
     response = client.delete("/cart/1/remove", json={"cart_item_id": 999})  # Nonexistent cart item ID
     assert response.status_code == 404
     data = response.get_json()
-    assert "error" in data
-    assert data["error"] == "Item not found"
+    assert data is not None  # Ensure a response is returned
+    assert "error" in data  # Ensure the error message is present
+    assert data["error"] == "Item not found"  # Match the exact error message from the backend

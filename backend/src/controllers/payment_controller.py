@@ -6,7 +6,6 @@ from flask import jsonify, Blueprint, request
 from dotenv import load_dotenv
 load_dotenv()
 
-
 payment_bp = Blueprint('payment_bp', __name__)
 
 @payment_bp.route('/create-payment-intent', methods=['POST'])
@@ -17,16 +16,14 @@ def create_payment():
     customer = data.get('customer', '')
 
     try:
-        # # Setup env vars beforehand 
-        # stripe_keys = {
-        #     "secret_key": os.environ["STRIPE_SECRET_KEY"],
-        #     "publishable_key": os.environ["STRIPE_PUBLISHABLE_KEY"],
-        # }
-
-        # stripe.api_key = stripe_keys["secret_key"]
-        # data = json.loads(request.data)
-        # print(data)
-        stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+        # Log the loaded Stripe key to confirm it's being loaded
+        stripe_api_key = os.getenv("STRIPE_SECRET_KEY")
+        if not stripe_api_key:
+            return jsonify(error="Stripe API key not found"), 403
+        
+        print(f"Stripe API Key Loaded: {stripe_api_key}")  # For debugging purposes
+        
+        stripe.api_key = stripe_api_key
         
         payment_intent = stripe.PaymentIntent.create(
             amount=1000,  # Adjust according to the price of "Premium"
@@ -34,29 +31,11 @@ def create_payment():
             metadata={'integration_check': 'accept_a_payment'},
         )
         
-        # intent = stripe.PaymentIntent.create(
-        #     amount=2000,
-        #     currency='eur',
-        #     automatic_payment_methods={
-        #         'enabled': True,
-        #     },
-        #     # Again, I am providing a user_uuid, so I can identify who is making the payment later
-        #     metadata={
-        #         'customer': data['customer']
-        #     },
-        # )
-        
-        # client_secret = intent['client_secret']
-        # print(f"Stripe clientSecret: {client_secret}")  # Ensure it's properly set
-
-        # return jsonify ({
-        #     'clientSecret': intent['client_secret']
-        # })
-          # Log the client secret to verify it
         print(f"Stripe clientSecret: {payment_intent.client_secret}")
 
         # Send the client secret to the frontend
         return jsonify({'clientSecret': payment_intent.client_secret})
 
     except Exception as e:
+        print(f"Error: {e}")  # Debugging exception
         return jsonify(error=str(e)), 403
