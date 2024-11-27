@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { BACKEND_BASE_URL } from "./constants";
+import { checkLoginStatus, redirectTo, get_user_info } from "./services/authService";
+import { FRONTEND_BASE_URL } from "./constants";
 
 function ProductDetailPage() {
   const { productId } = useParams();
@@ -9,7 +11,32 @@ function ProductDetailPage() {
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({});
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [seller_id, setSellerId] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const [alertShown, setAlertShown] = useState(false);
+
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Check login status as soon as the page is entered
+  useEffect(() => {
+    const checkStatus = async () => {
+      const loginStatus = await checkLoginStatus(navigate);
+      if (loginStatus) {
+        setIsLoggedIn(true);
+        const userInfo = await get_user_info();
+        console.log(userInfo);
+        setUserData(userInfo);
+
+      } else {
+        setIsLoggedIn(false);
+        redirectTo(`/authorize?next=${FRONTEND_BASE_URL}${location.pathname}`);
+      }
+    };
+
+    checkStatus();
+  }, [navigate, location]);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -21,6 +48,7 @@ function ProductDetailPage() {
         const data = await response.json();
         setProduct(data.product);
         setFormData(data.product);
+        setSellerId(data.product.seller_id);
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -86,160 +114,175 @@ function ProductDetailPage() {
     return <p style={{ textAlign: "center", color: "red", marginTop: "20px" }}>{error}</p>;
   }
 
+
+
   if (isEditing) {
-    return (
-      <div
-        style={{
-          maxWidth: "800px",
-          margin: "20px auto",
-          padding: "20px",
-          border: "1px solid #ddd",
-          borderRadius: "10px",
-        }}
-      >
-        <h2 style={{ textAlign: "center", marginBottom: "20px" }}>Edit Product</h2>
-        <form style={{ display: "grid", gap: "15px" }}>
-          <label>
-            Name:
-            <input
-              type="text"
-              name="name"
-              value={formData.name || ""}
-              onChange={handleInputChange}
+    const canEdit = userData && (userData.id === seller_id || userData.admin);
+    console.log(userData.id);
+    console.log(seller_id);
+    if (canEdit) {
+      return (
+        <div
+          style={{
+            maxWidth: "800px",
+            margin: "20px auto",
+            padding: "20px",
+            border: "1px solid #ddd",
+            borderRadius: "10px",
+          }}
+        >
+          <h2 style={{ textAlign: "center", marginBottom: "20px" }}>Edit Product</h2>
+          <form style={{ display: "grid", gap: "15px" }}>
+            <label>
+              Name:
+              <input
+                type="text"
+                name="name"
+                value={formData.name || ""}
+                onChange={handleInputChange}
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  borderRadius: "5px",
+                  border: "1px solid #ccc",
+                }}
+              />
+            </label>
+            <label>
+              Description:
+              <textarea
+                name="description"
+                value={formData.description || ""}
+                onChange={handleInputChange}
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  borderRadius: "5px",
+                  border: "1px solid #ccc",
+                }}
+              />
+            </label>
+            <label>
+              Price:
+              <input
+                type="number"
+                name="price"
+                value={formData.price || ""}
+                onChange={handleInputChange}
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  borderRadius: "5px",
+                  border: "1px solid #ccc",
+                }}
+              />
+            </label>
+            <label>
+              Gender:
+              <select
+                name="gender"
+                value={formData.gender || ""}
+                onChange={handleInputChange}
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  borderRadius: "5px",
+                  border: "1px solid #ccc",
+                }}
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Unisex">Unisex</option>
+              </select>
+            </label>
+            <label>
+              Size:
+              <select
+                name="size"
+                value={formData.size || ""}
+                onChange={handleInputChange}
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  borderRadius: "5px",
+                  border: "1px solid #ccc",
+                }}
+              >
+                <option value="">Select Size</option>
+                <option value="Extra Small">Extra Small</option>
+                <option value="Small">Small</option>
+                <option value="Medium">Medium</option>
+                <option value="Large">Large</option>
+                <option value="Extra Large">Extra Large</option>
+              </select>
+            </label>
+            <label>
+              Condition:
+              <select
+                name="condition"
+                value={formData.condition || ""}
+                onChange={handleInputChange}
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  borderRadius: "5px",
+                  border: "1px solid #ccc",
+                }}
+              >
+                <option value="">Select Condition</option>
+                <option value="New">New</option>
+                <option value="Slightly Used">Slightly Used</option>
+                <option value="Moderately Used">Moderately Used</option>
+                <option value="Heavily Used">Heavily Used</option>
+              </select>
+            </label>
+            <label>
+              Image:
+              <input type="file" onChange={handleImageChange} style={{ marginTop: "5px" }} />
+            </label>
+          </form>
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
+            <button
+              onClick={handleSave}
               style={{
-                width: "100%",
-                padding: "10px",
+                padding: "10px 15px",
+                backgroundColor: "#007bff",
+                color: "#fff",
+                border: "none",
                 borderRadius: "5px",
-                border: "1px solid #ccc",
-              }}
-            />
-          </label>
-          <label>
-            Description:
-            <textarea
-              name="description"
-              value={formData.description || ""}
-              onChange={handleInputChange}
-              style={{
-                width: "100%",
-                padding: "10px",
-                borderRadius: "5px",
-                border: "1px solid #ccc",
-              }}
-            />
-          </label>
-          <label>
-            Price:
-            <input
-              type="number"
-              name="price"
-              value={formData.price || ""}
-              onChange={handleInputChange}
-              style={{
-                width: "100%",
-                padding: "10px",
-                borderRadius: "5px",
-                border: "1px solid #ccc",
-              }}
-            />
-          </label>
-          <label>
-            Gender:
-            <select
-              name="gender"
-              value={formData.gender || ""}
-              onChange={handleInputChange}
-              style={{
-                width: "100%",
-                padding: "10px",
-                borderRadius: "5px",
-                border: "1px solid #ccc",
+                cursor: "pointer",
+                width: "48%",
               }}
             >
-              <option value="">Select Gender</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Unisex">Unisex</option>
-            </select>
-          </label>
-          <label>
-            Size:
-            <select
-              name="size"
-              value={formData.size || ""}
-              onChange={handleInputChange}
+              Save
+            </button>
+            <button
+              onClick={() => setIsEditing(false)}
               style={{
-                width: "100%",
-                padding: "10px",
+                padding: "10px 15px",
+                backgroundColor: "#6c757d",
+                color: "#fff",
+                border: "none",
                 borderRadius: "5px",
-                border: "1px solid #ccc",
+                cursor: "pointer",
+                width: "48%",
               }}
             >
-              <option value="">Select Size</option>
-              <option value="Extra Small">Extra Small</option>
-              <option value="Small">Small</option>
-              <option value="Medium">Medium</option>
-              <option value="Large">Large</option>
-              <option value="Extra Large">Extra Large</option>
-            </select>
-          </label>
-          <label>
-            Condition:
-            <select
-              name="condition"
-              value={formData.condition || ""}
-              onChange={handleInputChange}
-              style={{
-                width: "100%",
-                padding: "10px",
-                borderRadius: "5px",
-                border: "1px solid #ccc",
-              }}
-            >
-              <option value="">Select Condition</option>
-              <option value="New">New</option>
-              <option value="Slightly Used">Slightly Used</option>
-              <option value="Moderately Used">Moderately Used</option>
-              <option value="Heavily Used">Heavily Used</option>
-            </select>
-          </label>
-          <label>
-            Image:
-            <input type="file" onChange={handleImageChange} style={{ marginTop: "5px" }} />
-          </label>
-        </form>
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
-          <button
-            onClick={handleSave}
-            style={{
-              padding: "10px 15px",
-              backgroundColor: "#007bff",
-              color: "#fff",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-              width: "48%",
-            }}
-          >
-            Save
-          </button>
-          <button
-            onClick={() => setIsEditing(false)}
-            style={{
-              padding: "10px 15px",
-              backgroundColor: "#6c757d",
-              color: "#fff",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-              width: "48%",
-            }}
-          >
-            Cancel
-          </button>
+              Cancel
+            </button>
+          </div>
         </div>
-      </div>
-    );
+      );
+    }
+    else {
+      if (!alertShown) {
+        alert('You cannot edit this because you are neither the seller nor an admin');
+        setAlertShown(true); // Set the flag to true after showing the alert
+        setIsEditing(false); // Exit edit mode to prevent further re-renders
+      }
+      return null;
+    }
   }
 
   return (
