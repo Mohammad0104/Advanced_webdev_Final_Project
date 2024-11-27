@@ -1,28 +1,27 @@
 name: CI/CD Pipeline - Testing
-
-on: 
+on:
   push:
-    branches:
-      - github-workflow  # Trigger on pushes to the github-workflow branch
+      branches:
+        - main
+        - develop
+        - tests-cli
   pull_request:
-    branches:
-      - github-workflow  # Trigger on pull requests targeting the github-workflow branch
+      branches:
+        - main
+        - develop
+        - tests-cli
 
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.8'
-
       - name: Install dependencies
         run: pip install -r requirements.txt
-
       - name: Run tests
         run: pytest
