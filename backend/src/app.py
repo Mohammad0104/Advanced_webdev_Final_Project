@@ -15,7 +15,7 @@ from flask_cors import CORS
 
 def create_app(config=None):
     app = Flask(__name__)
-    
+
     # Load the configuration from the Config object or the passed config
     app.config.from_object(Config)
     
@@ -24,8 +24,6 @@ def create_app(config=None):
 
     # Enable CORS for all routes (you can specify origins if needed)
     CORS(app, resources={r"/*": {"origins": "*"}})
-    # Alternatively, for restricted CORS access:
-    # CORS(app, supports_credentials=True, origins=['http://localhost:3000'], debug=True)
     
     # Initialize extensions
     db.init_app(app)
