@@ -258,11 +258,21 @@ function ProductPage({ products, setProducts }) {
             required
             min="1"
             step="1"
-            onBlur={(e) => {
-              // when the input loses focus, check if the value is below 1
-              // (this way you can type values, but if you leave and it is invalid it changes to the default 1)
-              if (parseInt(e.target.value) < 1) {
-                e.target.value = 1;
+            onInput={(e) => {
+              // allow backspace, delete, and valid input
+              // (not allowing invalid characters or using more than 2 decimal places)
+              const regex = /^(?:\d+(\.\d{0,2})?|\.\d{1,2})$/;
+              const value = e.target.value;
+          
+              // if the input doesn't match the regex, reset the value to the last valid one
+              if (!regex.test(value) && value !== '') {
+                e.target.value = value.slice(0, -1);  // remove last character if invalid
+              }
+
+              // If the input doesn't match the regex, reset the value to the last valid one
+              if (!regex.test(value)) {
+                e.target.value = value.replace(/e/gi, ""); // Remove 'e' or 'E' characters
+                e.target.value = e.target.value.replace(/\D/g, ""); // Remove any non-numeric characters
               }
             }}
             style={{ display: 'block', marginTop: '5px' }}

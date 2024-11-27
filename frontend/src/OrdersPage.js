@@ -46,7 +46,7 @@ export default function OrdersPage() {
         orders.map((order) => (
           <div key={order.id} style={{ marginBottom: '50px', border: "0.5px solid #696969", backgroundColor: '#E8E8E8', borderRadius: '10px' }}>
             <h3 style={{marginBottom: '0px', fontWeight: 'normal'}}><strong>Date:</strong> {order.order_date}</h3>
-            <h3 style={{margin: '0px'}}>Total: ${order.total.toFixed(2)}</h3>
+            <h3 style={{margin: '0px', fontStyle: 'italic'}}>Total: ${order.total.toFixed(2)}</h3>
             <h4 style={{marginBottom: '0px', backgroundColor: '#C0C0C0'}}>Items:</h4>
             <div style={{ marginTop: '0px', marginBottom: '3px', backgroundColor: '#D3D3D3' }}>
               {order.items.map((item, index) => (

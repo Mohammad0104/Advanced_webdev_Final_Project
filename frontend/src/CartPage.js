@@ -87,6 +87,7 @@ function CartPage({ cart }) {
         setLocalCart(updatedCart.items);
       } else {
         console.error('Failed to update quantity:', response.statusText);
+        alert("Cannot increase quantity since there isn't enough of the product, to add more to cart");
       }
     } catch (error) {
       console.error('Error updating quantity:', error);
@@ -132,7 +133,8 @@ function CartPage({ cart }) {
     if (localCart.length === 0) {
       alert("Your cart is empty. Add some products first!");
     } else {
-      setShowForm(true);
+      navigate('/paymentpage');
+      // setShowForm(true);
     }
   };
 
@@ -265,3 +267,151 @@ function CartPage({ cart }) {
   );
 }
 export default CartPage;
+// import React, { useState, useEffect } from 'react';
+// import { useNavigate, useLocation } from 'react-router-dom';
+// import { FRONTEND_BASE_URL, BACKEND_BASE_URL } from './constants';
+// import { checkLoginStatus, get_user_info, redirectTo } from './services/authService';
+
+// function CartPage({ cart }) {
+//   const [localCart, setLocalCart] = useState(cart || []);
+//   const [cartId, setCardId] = useState(null);
+//   const [showForm, setShowForm] = useState(false);
+//   const [userInfo, setUserInfo] = useState({
+//     name: '',
+//     address: '',
+//     deliveryDate: '',
+//   });
+//   const [errorMessage, setErrorMessage] = useState('');
+//   const location = useLocation();
+//   const navigate = useNavigate();
+//   const [isLoggedIn, setIsLoggedIn] = useState(false);
+//   const [userData, setUserData] = useState(null);
+
+//   useEffect(() => {
+//     const checkStatus = async () => {
+//       const loginStatus = await checkLoginStatus(navigate);
+//       if (loginStatus) {
+//         setIsLoggedIn(true);
+//         const userInfo = await get_user_info();
+//         setUserData(userInfo);
+//       } else {
+//         setIsLoggedIn(false);
+//         redirectTo(`/authorize?next=${FRONTEND_BASE_URL}${location.pathname}`);
+//       }
+//     };
+
+//     checkStatus();
+//   }, [navigate, location.pathname]);
+
+//   useEffect(() => {
+//     if (userData) {
+//       const fetchCart = async () => {
+//         try {
+//           const response = await fetch(`${BACKEND_BASE_URL}/cart/${userData.id}`, {
+//             method: 'GET',
+//             headers: {
+//               'Content-Type': 'application/json',
+//             },
+//           });
+
+//           if (response.ok) {
+//             const cartData = await response.json();
+//             setLocalCart(cartData.items);
+//             setCardId(cartData.id);
+//           } else {
+//             console.error('Failed to fetch cart:', response.statusText);
+//           }
+//         } catch (error) {
+//           console.error('Error fetching cart:', error);
+//         }
+//       };
+
+//       fetchCart();
+//     }
+//   }, [userData]);
+
+//   let subtotal = 0;
+//   if (localCart) {
+//     subtotal = localCart.reduce((acc, item) => acc + parseFloat(item.product_price || 0) * item.quantity, 0);
+//   }
+
+//   const updateQuantityInDB = async (itemId, newQuantity) => {
+//     try {
+//       const response = await fetch(`${BACKEND_BASE_URL}/cart/update/${cartId}`, {
+//         method: 'PUT',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({
+//           product_id: itemId,
+//           quantity: newQuantity,
+//           subtotal: subtotal,
+//         }),
+//       });
+//       if (response.ok) {
+//         const updatedCart = await response.json();
+//         setLocalCart(updatedCart.items);
+//       } else {
+//         const errorData = await response.json();
+//         if (errorData && errorData.message) {
+//           alert(errorData.message); // Notify user of any server-defined error
+//         } else {
+//           console.error('Failed to update quantity:', response.statusText);
+//         }
+//       }
+//     } catch (error) {
+//       console.error('Error updating quantity:', error);
+//     }
+//   };
+  
+
+//   const handleQuantityChange = (itemId, change) => {
+//     const item = localCart.find((item) => item.product_id === itemId);
+//     const newQuantity = Math.max(item.quantity + change, 1); // Ensure quantity is at least 1
+//     updateQuantityInDB(itemId, newQuantity);
+//   };
+
+//   return (
+//     <div>
+//       <h1>Your Cart</h1>
+//       {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+//       {localCart.length === 0 ? (
+//         <p>Your cart is empty.</p>
+//       ) : (
+//         <div>
+//           {localCart.map((item, index) => (
+//             <div key={index} style={{ border: '1px solid #ddd', padding: '10px', marginBottom: '10px', borderRadius: '5px' }}>
+//               <p>
+//                 <strong>{item.product_name}</strong>
+//               </p>
+//               <p>${(item.product_price ?? 0).toFixed(2)} each</p>
+//               <p>
+//                 <strong>Quantity:</strong>
+//                 <button
+//                   onClick={() => handleQuantityChange(item.product_id, -1)}
+//                   disabled={item.quantity <= 1}
+//                   style={{ margin: '0 10px', padding: '5px' }}
+//                 >
+//                   -
+//                 </button>
+//                 {item.quantity}
+//                 <button
+//                   onClick={() => handleQuantityChange(item.product_id, 1)}
+//                   disabled={item.quantity >= item.available_stock}
+//                   style={{ margin: '0 10px', padding: '5px' }}
+//                 >
+//                   +
+//                 </button>
+//               </p>
+//             </div>
+//           ))}
+//           <p>
+//             <strong>Subtotal:</strong> ${subtotal.toFixed(2)}
+//           </p>
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
+
+// export default CartPage;

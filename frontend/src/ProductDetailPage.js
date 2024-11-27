@@ -61,9 +61,10 @@ function ProductDetailPage() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+
     setFormData((prevFormData) => ({
       ...prevFormData,
-      [name]: value,
+      [name]: name === "featured" ? value === "true" : value, // Convert "true"/"false" to boolean for "featured"
     }));
   };
 
@@ -118,8 +119,8 @@ function ProductDetailPage() {
 
   if (isEditing) {
     const canEdit = userData && (userData.id === seller_id || userData.admin);
-    console.log(userData.id);
-    console.log(seller_id);
+    // console.log(userData.id);
+    // console.log(seller_id);
     if (canEdit) {
       return (
         <div
@@ -165,7 +166,7 @@ function ProductDetailPage() {
             <label>
               Price:
               <input
-                type="number"
+                type="text"
                 name="price"
                 value={formData.price || ""}
                 onChange={handleInputChange}
@@ -174,6 +175,52 @@ function ProductDetailPage() {
                   padding: "10px",
                   borderRadius: "5px",
                   border: "1px solid #ccc",
+                }}
+                min="0"
+                onInput={(e) => {
+                  // allow backspace, delete, and valid input
+                  // (not allowing invalid characters or using more than 2 decimal places)
+                  const regex = /^(?:\d+(\.\d{0,2})?|\.\d{1,2})$/;
+                  const value = e.target.value;
+              
+                  // if the input doesn't match the regex, reset the value to the last valid one
+                  if (!regex.test(value) && value !== '') {
+                    e.target.value = value.slice(0, -1);  // remove last character if invalid
+                  }
+
+                  // If the input doesn't match the regex, reset the value to the last valid one
+                  if (!regex.test(value)) {
+                    e.target.value = value.replace(/e/gi, ""); // Remove 'e' or 'E' characters
+                    e.target.value = e.target.value.replace(/\D/g, ""); // Remove any non-numeric characters
+                  }
+                }}
+              />
+            </label>
+            <label>
+              Quantity:
+              <input
+                type="text"
+                name="quantity"
+                value={formData.quantity || ""}
+                onChange={handleInputChange}
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  borderRadius: "5px",
+                  border: "1px solid #ccc",
+                }}
+                min="1"
+                step="1"
+                onInput={(e) => {
+                  // allow backspace, delete, and valid input
+                  // (not allowing invalid characters or using more than 2 decimal places)
+                  const regex = /^(?:\d+(\.\d{0,2})?|\.\d{1,2})$/;
+                  const value = e.target.value;
+              
+                  // if the input doesn't match the regex, reset the value to the last valid one
+                  if (!regex.test(value) && value !== '') {
+                    e.target.value = value.slice(0, -1);  // remove last character if invalid
+                  }
                 }}
               />
             </label>
@@ -237,6 +284,25 @@ function ProductDetailPage() {
                 <option value="Heavily Used">Heavily Used</option>
               </select>
             </label>
+            {userData?.admin && ( // Check if user is an admin
+            <label>
+              Featured:
+              <select
+                name="featured"
+                value={formData.featured || ""}
+                onChange={handleInputChange}
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  borderRadius: "5px",
+                  border: "1px solid #ccc",
+                }}
+              >
+                <option value="false">No</option>
+                <option value="true">Yes</option>
+              </select>
+            </label>
+            )}
             <label>
               Image:
               <input type="file" onChange={handleImageChange} style={{ marginTop: "5px" }} />
@@ -302,7 +368,7 @@ function ProductDetailPage() {
           <strong>Name:</strong> {product.name}
         </p>
         <p style={{ fontSize: "20px", margin: "5px 0" }}>
-          <strong>Price:</strong> ${product.price}
+          <strong>Price:</strong> ${product.price.toFixed(2)}
         </p>
       </div>
       <div style={{ margin: "20px 0", textAlign: "center" }}>
@@ -324,7 +390,7 @@ function ProductDetailPage() {
         <strong>Gender:</strong> {product.gender}
       </p>
       <p>
-        <strong>Size:</strong> {product.size}
+        {product.youth_size ? 'Youth' : 'Adult'} {product.size}
       </p>
       <p>
         <strong>Quantity:</strong> {product.quantity}

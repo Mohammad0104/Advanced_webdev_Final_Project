@@ -62,26 +62,31 @@ function ProductListPage({ setCart }) {
       quantity: 1
     }
 
-    try {
-        const response = await fetch(`${BACKEND_BASE_URL}/cart/${userData.id}/add`, {
-            method: 'POST',
-            body: JSON.stringify(payload),
-            headers: {
-              'Content-Type': 'application/json'
-            }
-        });
+    if (product.quantity >= 1) {
+      try {
+          const response = await fetch(`${BACKEND_BASE_URL}/cart/${userData.id}/add`, {
+              method: 'POST',
+              body: JSON.stringify(payload),
+              headers: {
+                'Content-Type': 'application/json'
+              }
+          });
 
-        const data = await response.json();
-        console.log("Cart updated:", data);
+          const data = await response.json();
+          console.log("Cart updated:", data);
 
-        // Assuming the cart needs to be updated in the state
-        setCart((prevCart) => [...prevCart, product]);
+          // Assuming the cart needs to be updated in the state
+          setCart((prevCart) => [...prevCart, product]);
 
-        // Navigate to the cart page
-        alert(`1 ${product.name} added to cart`)
-        // navigate('/cart');
-    } catch (error) {
-        console.error("Error updating cart:", error);
+          // Navigate to the cart page
+          alert(`1 ${product.name} added to cart`)
+          // navigate('/cart');
+      } catch (error) {
+          console.error("Error updating cart:", error);
+      }
+    }
+    else {
+      alert('Cannot add to cart because the item is currently sold out');
     }
 };
 
@@ -111,65 +116,63 @@ function ProductListPage({ setCart }) {
               marginBottom: '15px',
               borderRadius: '8px',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+              backgroundColor: prod.featured ? '#fffacd' : 'white', // Light gold for featured, white otherwise
             }}
           >
             <p>
-              <strong>Name:</strong> {prod.name}
+              <strong>{prod.name}</strong>
+            </p>
+            <p style={{fontStyle: 'italic', fontWeight: 'bold'}}>
+              ${prod.price.toFixed(2)}
             </p>
             <p>
-              <strong>Price:</strong> ${prod.price}
+              {prod.youth_size ? 'Youth' : 'Adult'} {prod.gender} {prod.size}
             </p>
             <p>
-              <strong>Description:</strong> {prod.description || 'No description available'}
-            </p>
-            <p>
-              <strong>Gender:</strong> {prod.gender}
-            </p>
-            <p>
-              <strong>Size:</strong> {prod.size}
-            </p>
-            <p>
-              <strong>Brand:</strong> {prod.brand}
-            </p>
-            <p>
-              <strong>Sport:</strong> {prod.sport}
-            </p>
-            <p>
-              <strong>Condition:</strong> {prod.condition}
-            </p>
-            <p>
-              <strong>Average Rating:</strong> {prod.avgRating || 'N/A'}
+              {prod.condition}
             </p>
             {prod.image && (
               <img
                 src={prod.image.startsWith('data:') ? prod.image : `data:image/png;base64,${prod.image}`}
                 alt={prod.name}
                 style={{
-                  width: '100%',
-                  maxHeight: '400px',
-                  objectFit: 'cover',
+                  width: '90%',
+                  maxHeight: '250px',
+                  objectFit: 'scale-down',
                   marginTop: '10px',
                   borderRadius: '5px',
                 }}
               />
             )}
-            <button
-              onClick={() => handleBuy(prod)}
+            {prod.quantity === 0 ? (
+            <p
               style={{
-                padding: '10px 15px',
-                backgroundColor: '#007bff',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                marginTop: '20px',
-                display: 'block',
-                marginLeft: 'auto',
-                marginRight: 'auto',
+                color: 'red',
+                fontWeight: 'bold',
+                textAlign: 'center',
+                marginTop: '10px',
               }}
             >
-              Add to Cart
-            </button>
+              SOLD OUT
+            </p> ) : (
+              <button
+                onClick={() => handleBuy(prod)}
+                style={{
+                  padding: '10px 15px',
+                  backgroundColor: '#007bff',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+                  marginTop: '20px',
+                  display: 'block',
+                  marginLeft: 'auto',
+                  marginRight: 'auto',
+                }}
+              >
+                Add to Cart
+              </button>
+            )}
             <Link
               to={`/product/${prod.id}`}
               style={{

@@ -18,7 +18,10 @@ def create_app():
   app = Flask(__name__)
   app.config.from_object(Config)
   
-  CORS(app, resources={r"/*": {"origins": "*"}})
+  # CORS(app, resources={r"/*": {"origins": "*"}})
+  CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+
+  
   # CORS(app, supports_credentials=True, origins=['http://localhost:3000'], debug=True)
   # CORS(oauth_bp)
   # CORS(product_bp)
