@@ -6,9 +6,10 @@ from models.user import User
 # Create a Flask Blueprint named 'user'. This modularizes the routes related to user operations.
 user_blueprint = Blueprint('user', __name__)
 
+
 @user_blueprint.route('/users/<int:user_id>', methods=['GET'])
 def get_user(user_id: int):
-    """Endpoint to get the user by id
+    """Endpoint to get the user by id.
 
     Args:
         user_id (int): the id of the user to get
@@ -26,16 +27,15 @@ def get_user(user_id: int):
         return jsonify({'message': 'User not found'}), 404
 
 
-
 @user_blueprint.route('/users/email/<email>', methods=['GET'])
 def get_user_by_email_route(email):
-    """_summary_
+    """Fetch a user by their email.
 
     Args:
-        email (_type_): _description_
+        email (str): The email of the user to retrieve.
 
     Returns:
-        _type_: _description_
+        JSON: A JSON message with the user data or an error message.
     """
     # Fetch a user by their email
     user = get_user_by_email(email)
