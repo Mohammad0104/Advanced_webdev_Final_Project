@@ -27,3 +27,6 @@
 - To run on docker (not final because of problems with doing requests):
   - `docker-compose up --build`
   - then go to `http://localhost:3000`
+
+## Database Diagram
+![database diagram](assets/db_diagram.png)
