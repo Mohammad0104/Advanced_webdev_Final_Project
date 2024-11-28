@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 from services.user_service import (
-    get_user_by_id, 
+    get_user_by_id,
     get_user_by_email
 )
 
