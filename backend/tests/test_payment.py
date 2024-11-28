@@ -2,7 +2,7 @@ import requests
 import json
 
 # Define the API endpoint
-url = "http://127.0.0.1:5000/create-payment-intent"  # Update if your app is running on a different host or port
+url = "http://127.0.0.1:5000/create-payment-intent"  
 
 # Test payload to simulate items and customer data
 payload = {

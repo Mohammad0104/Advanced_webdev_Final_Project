@@ -151,7 +151,7 @@ def test_get_user_order_history(app, client, setup_database):
     assert response.status_code == 200
 
     data = response.get_json()
-    assert len(data['orders']) == 1  # Ensure only one order is retrieved
+    assert len(data['orders']) == 1  
     assert data['orders'][0]['total'] == 125.0
     assert len(data['orders'][0]['items']) == 2
 
@@ -175,7 +175,7 @@ def test_create_order(app, client, setup_database):
 
 def test_create_order_no_cart(app, client):
     """Test creating an order for a user with no cart."""
-    response = client.post(f'/api/orders/create/999')  # Non-existent user/cart
+    response = client.post(f'/api/orders/create/999')  
     assert response.status_code == 500
     data = response.get_json()
     assert "Cart not found" in data['error']
@@ -183,7 +183,7 @@ def test_create_order_no_cart(app, client):
 
 def test_get_user_order_history_no_orders(app, client):
     """Test retrieving an order history for a user with no orders."""
-    response = client.get(f'/api/orders/user/2')  # User with no orders
+    response = client.get(f'/api/orders/user/2')  
     assert response.status_code == 200
     data = response.get_json()
     assert len(data['orders']) == 0

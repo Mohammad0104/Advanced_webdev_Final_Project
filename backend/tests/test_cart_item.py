@@ -63,7 +63,7 @@ def setup_database(app):
             size="M",
             condition="New",
             quantity=10,
-            youth_size=False,  # Ensures `youth_size` is not null
+            youth_size=False,  
             brand="Brand A",
             sport="Sport A",
             date_listed=datetime.utcnow()
@@ -77,7 +77,7 @@ def setup_database(app):
             size="L",
             condition="New",
             quantity=5,
-            youth_size=True,  # Ensures `youth_size` is not null
+            youth_size=True,  
             brand="Brand B",
             sport="Sport B",
             date_listed=datetime.utcnow()
@@ -134,7 +134,7 @@ def test_add_existing_product_to_cart(client, setup_database):
 
     # Verify the cart's contents
     data = response.get_json()
-    assert data['subtotal'] == 150.0  # (2 + 1) x 50.0
+    assert data['subtotal'] == 150.0  
     assert len(data['items']) == 1
     assert data['items'][0]['quantity'] == 3
 

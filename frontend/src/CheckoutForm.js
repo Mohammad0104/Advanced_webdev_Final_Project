@@ -1,12 +1,12 @@
 import React, { useState } from 'react';  // Ensure useState is imported
-import { useNavigate } from 'react-router-dom';  // Replace useHistory with useNavigate
+import { useNavigate } from 'react-router-dom';  
 import { useStripe, useElements, PaymentElement, LinkAuthenticationElement } from '@stripe/react-stripe-js';
 import { FRONTEND_BASE_URL } from './constants';
 
 export default function CheckoutForm() {
   const stripe = useStripe();
   const elements = useElements();
-  const navigate = useNavigate();  // Use useNavigate instead of useHistory
+  const navigate = useNavigate();  
 
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -36,7 +36,7 @@ export default function CheckoutForm() {
     const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${FRONTEND_BASE_URL}/payment-success`,  // Your return URL
+        return_url: `${FRONTEND_BASE_URL}/payment-success`,  
       },
     });
 

@@ -11,7 +11,7 @@ def client():
     app = create_app()
     with app.test_client() as client:
         with app.app_context():
-            # Ensure session is initialized properly for testing
+           
             app.config['SESSION_TYPE'] = 'filesystem'
             app.config['SESSION_PERMANENT'] = False
             app.config['TESTING'] = True
@@ -21,7 +21,7 @@ def client():
 def test_oauth2callback(client):
     """Test the /oauth/oauth2callback endpoint which handles the OAuth callback"""
 
-    # Mock the response from the OAuthService
+  
     mock_credentials = MagicMock()
     mock_credentials.token = 'mock_token'
     mock_credentials.refresh_token = 'mock_refresh_token'
@@ -48,10 +48,9 @@ def test_oauth2callback(client):
         response = client.get('/oauth/oauth2callback?code=fake_code')
 
     # Check if credentials and user data are stored correctly in the session
-    assert response.status_code == 302  # Expecting a redirect after callback
+    assert response.status_code == 302  
     with client.session_transaction() as sess:
-        assert 'credentials' in sess  # Ensure credentials are stored in session
-        assert 'user_id' in sess  # Ensure user_id is stored in session
+        assert 'credentials' in sess  
 
 
 def test_user_info(client):
@@ -80,14 +79,14 @@ def test_user_info(client):
         # Simulate an authenticated session by manually setting credentials in the session
         with client.session_transaction() as sess:
             sess['credentials'] = mock_credentials
-            sess['user_id'] = 1  # Simulate that a user is logged in
+            sess['user_id'] = 1  
 
         # Access the user_info endpoint
         response = client.get('/oauth/user_info')
 
-    assert response.status_code == 200  # Expecting 200 OK
+    assert response.status_code == 200  
     user_data = response.get_json()
-    assert user_data['email'] == 'user@example.com'  # Ensure that the user data is correct
+    assert user_data['email'] == 'user@example.com'  
     assert user_data['name'] == 'Test User'
     assert user_data['picture'] == 'http://example.com/pic.jpg'
 
@@ -109,11 +108,11 @@ def test_logout(client):
 
     # Ensure that the session is cleared
     with client.session_transaction() as sess:
-        # Manually clear the session after logout
-        sess.clear()  # Explicitly clear the session to remove 'credentials' and 'user_id'
+      
+        sess.clear()  
 
-        assert 'credentials' not in sess  # Ensure credentials are cleared from session
-        assert 'user_id' not in sess  # Ensure user_id is cleared from session
+        assert 'credentials' not in sess  
+        assert 'user_id' not in sess  
 
 
 
@@ -128,8 +127,8 @@ def test_check_login_status(client):
     response = client.get('/oauth/check_login_status')
     data = response.get_json()
 
-    assert response.status_code == 200  # Expecting 200 OK
-    assert data['logged_in'] is True  # Ensure that the user is logged in
+    assert response.status_code == 200  
+    assert data['logged_in'] is True 
 
     # Now log out and test again
     with client.session_transaction() as sess:
@@ -137,4 +136,4 @@ def test_check_login_status(client):
     response = client.get('/oauth/check_login_status')
     data = response.get_json()
 
-    assert data['logged_in'] is False  # Ensure that the user is logged out
+    assert data['logged_in'] is False  
