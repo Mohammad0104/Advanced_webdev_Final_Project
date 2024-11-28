@@ -15,7 +15,7 @@ const ProfilePage = () => {
         const userData = await get_user_info();
         setUser(userData);
       }
-      setLoading(false); // Stop loading regardless of login status
+      setLoading(false); 
     };
 
     initializePage(); // Run the initialization when the component mounts
