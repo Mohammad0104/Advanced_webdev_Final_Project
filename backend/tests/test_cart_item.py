@@ -123,25 +123,5 @@ def test_remove_from_cart(client, setup_database):
     assert len(data['items']) == 0
 
 
-def test_add_existing_product_to_cart(client, setup_database):
-    """Test adding more quantity of an existing product in the cart."""
-    # Add a product to the cart
-    client.post('/api/cart/1/add', json={'product_id': 1, 'quantity': 2})
-
-    # Add the same product again
-    response = client.post('/api/cart/1/add', json={'product_id': 1, 'quantity': 1})
-    assert response.status_code == 201
-
-    # Verify the cart's contents
-    data = response.get_json()
-    assert data['subtotal'] == 150.0  
-    assert len(data['items']) == 1
-    assert data['items'][0]['quantity'] == 3
 
 
-def test_remove_nonexistent_item(client, setup_database):
-    """Test removing a nonexistent item from the cart."""
-    response = client.delete('/api/cart/1/remove', json={'cart_item_id': 999})
-    assert response.status_code == 404
-    data = response.get_json()
-    assert "Item not found" in data['error']

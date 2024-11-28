@@ -68,7 +68,7 @@ function ProductPage({ products, setProducts }) {
     }
     setProduct((prev) => ({
       ...prev,
-      image: file, // Store the selected file
+      image: file, 
     }));
   };
 

@@ -96,7 +96,7 @@ function CartPage({ cart }) {
 
   const handleQuantityChange = (itemId, change) => {
     const item = localCart.find(item => item.product_id === itemId);
-    const newQuantity = Math.max(item.quantity + change, 1); // Ensure quantity is at least 1
+    const newQuantity = Math.max(item.quantity + change, 1); 
     updateQuantityInDB(itemId, newQuantity);
   };
 

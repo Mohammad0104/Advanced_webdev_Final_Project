@@ -1,5 +1,5 @@
-# models/user.py
 from models import db
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -15,9 +15,9 @@ class User(db.Model):
             'name': self.name,
             'email': self.email,
             'profile_pic_url': self.profile_pic_url,
-            'admin': self.admin
+            'admin': self.admin,
         }
 
-    # Ensure that serialize method is added
     def serialize(self):
+        """Serialize the User object using to_dict."""
         return self.to_dict()

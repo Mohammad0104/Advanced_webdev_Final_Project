@@ -47,8 +47,8 @@ export default function CheckoutForm() {
     } else if (paymentIntent && paymentIntent.status === 'succeeded') {
       setMessage('Payment succeeded!');
       setIsLoading(false);
-      // Redirect to a success page (could be a confirmation page or a new route)
-      navigate('/');  // Use navigate() to redirect
+      
+      navigate('/');  
     } else {
       setMessage('Payment failed. Please try again.');
       setIsLoading(false);

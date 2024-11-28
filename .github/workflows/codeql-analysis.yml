@@ -1,0 +1,34 @@
+name: CodeQL Analysis
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - CLI
+  pull_request:
+    branches:
+      - main
+      - develop
+      - CLI
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+      security-events: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: python
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          debug: true

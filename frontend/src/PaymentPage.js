@@ -24,7 +24,7 @@ export default function PaymentPage() {
             },
             body: JSON.stringify({
                 items: [{ id: "Premium" }],
-                customer: "user_uuid", // Replace with actual user UUID if needed
+                customer: "user_uuid", 
             }),
             });
 
@@ -38,7 +38,7 @@ export default function PaymentPage() {
         } catch (error) {
             console.error('Error fetching client secret:', error);
         } finally {
-            setLoading(false); // Set loading to false once the data is fetched
+            setLoading(false); 
         }
         };
 
@@ -53,7 +53,7 @@ export default function PaymentPage() {
 
   if (!clientSecret) {
     console.error("client secret empty or undefined");
-    return <div>Loading...</div>;  // You can display a loading indicator or message here
+    return <div>Loading...</div>;  
   }
 
    const appearance = {

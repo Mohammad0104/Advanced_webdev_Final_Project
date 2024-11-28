@@ -1,26 +1,18 @@
 import pytest
 from flask import Flask
-from models import db
-from models.user import User
-from controllers.user_controller import user_blueprint
 from unittest.mock import patch, MagicMock
+from controllers.review_controller import review_blueprint
 
 
 @pytest.fixture
 def app():
     """Fixture to create a Flask application for testing."""
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['TESTING'] = True
 
-    # Register the user blueprint
-    app.register_blueprint(user_blueprint)
+    # Register the review blueprint
+    app.register_blueprint(review_blueprint)
 
-    # Initialize the database
-    db.init_app(app)
-    with app.app_context():
-        db.create_all()
     yield app
 
 
@@ -30,104 +22,72 @@ def client(app):
     return app.test_client()
 
 
-@pytest.fixture
-def sample_user(app):
-    """Add a sample user to the database."""
-    user = User(
-        name='Test User',
-        email='test@example.com',
-        profile_pic_url='https://example.com/profile.jpg',
-        admin=False,
-    )
-
-    # Mock the serialize method for the sample user
-    def mock_serialize(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'email': self.email,
-            'profile_pic_url': self.profile_pic_url,
-            'admin': self.admin,
-        }
-
-    # Attach mock_serialize method to the user instance
-    setattr(User, "serialize", mock_serialize)
-
-    with app.app_context():
-        db.session.add(user)
-        db.session.commit()
-        db.session.refresh(user)
-    return user
-
-
-def test_register_user(client):
-    """Test registering a new user."""
+def test_create_review(client):
+    """Test creating a new review."""
     payload = {
-        'name': 'New User',
-        'email': 'newuser@example.com',
-        'profile_pic_url': 'https://example.com/profile_new.jpg',
+        'reviewer_id': 1,
+        'product_id': 101,
+        'rating': 4.5,
+        'explanation': 'Great product!',
     }
 
-    # Mock the user creation process
-    with patch("src.services.user_service.create_user") as mock_create_user:
-        # Create a MagicMock object for the user
-        mock_user = MagicMock()
+    # Patch the location where `add_review` is imported in `review_controller`
+    with patch("controllers.review_controller.add_review") as mock_add_review:
+        mock_review = MagicMock()
+        mock_review.id = 123
+        mock_add_review.return_value = mock_review
 
-        # Mock the `serialize` method of the mock user
-        mock_user.serialize.return_value = {
-            'id': 1,
-            'name': payload['name'],
-            'email': payload['email'],
-            'profile_pic_url': payload['profile_pic_url'],
-            'admin': False,
-        }
+        response = client.post('/create_review', json=payload)
 
-        mock_create_user.return_value = mock_user
-
-        response = client.post('/users/register', json=payload)
-
+    # Validate the response
     assert response.status_code == 201, f"Error: {response.get_json()}"
     data = response.get_json()
-    assert data['name'] == payload['name']
-    assert data['email'] == payload['email']
+    assert data['id'] == 123
+    assert data['message'] == 'Review created successfully'
 
 
-def test_login_user(client, sample_user):
-    """Test logging in a user."""
-    payload = {
-        'email': sample_user.email,
-        # No password needed for OAuth
-    }
+def test_retrieve_reviews(client):
+    """Test retrieving reviews for a product."""
+    product_id = 101
 
-    # Mock the login-related operations
-    with patch("src.controllers.user_controller.get_user_by_email") as mock_get_user:
-        # Mock the user object with the serialize method
-        mock_user = MagicMock()
-        mock_user.serialize.return_value = {
-            'id': sample_user.id,
-            'name': sample_user.name,
-            'email': sample_user.email,
-            'profile_pic_url': sample_user.profile_pic_url,
-            'admin': sample_user.admin
-        }
+    # Patch the location where `get_reviews_by_product` is imported in `review_controller`
+    with patch("controllers.review_controller.get_reviews_by_product") as mock_get_reviews:
+        mock_get_reviews.return_value = [
+            {
+                'review_id': 1,
+                'reviewer_id': 2,
+                'rating': 4.5,
+                'explanation': 'Great product!',
+            },
+            {
+                'review_id': 2,
+                'reviewer_id': 3,
+                'rating': 3.0,
+                'explanation': 'Good but could be better.',
+            },
+        ]
 
-        mock_get_user.return_value = mock_user
+        response = client.get(f'/reviews/product/{product_id}')
 
-        response = client.post('/users/login', json=payload)
-
+    # Validate the response
     assert response.status_code == 200, f"Error: {response.get_json()}"
     data = response.get_json()
-    assert data['message'] == 'Login successful'
-    assert data['user']['email'] == sample_user.email
+    assert len(data['reviews']) == 2
+    assert data['reviews'][0]['review_id'] == 1
+    assert data['reviews'][1]['rating'] == 3.0
 
 
-def test_get_user(client, sample_user, app):
-    """Test fetching a user by ID."""
-    with app.app_context():
-        response = client.get(f'/users/{sample_user.id}')
-        assert response.status_code == 200
-        data = response.get_json()
-        assert data['id'] == sample_user.id
-        assert data['name'] == sample_user.name
-        assert data['email'] == sample_user.email
-        assert data['profile_pic_url'] == sample_user.profile_pic_url
+def test_delete_review(client):
+    """Test deleting a review."""
+    review_id = 1
+
+    # Patch the location where `delete_review` is imported in `review_controller`
+    with patch("controllers.review_controller.delete_review") as mock_delete_review:
+        mock_delete_review.return_value = True
+
+        response = client.delete(f'/reviews/{review_id}')
+
+    # Validate the response
+    assert response.status_code == 200, f"Error: {response.get_json()}"
+    data = response.get_json()
+    assert data['message'] == 'Review deleted successfully'
