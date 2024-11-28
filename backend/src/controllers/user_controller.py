@@ -1,7 +1,5 @@
-from flask import Blueprint, request, jsonify
-from werkzeug.security import generate_password_hash, check_password_hash
-from services.user_service import get_user_by_id, get_user_by_email, create_user, update_name
-from models.user import User
+from flask import Blueprint, jsonify
+from services.user_service import get_user_by_id, get_user_by_email
 
 # Create a Flask Blueprint named 'user'. This modularizes the routes related to user operations.
 user_blueprint = Blueprint('user', __name__)
