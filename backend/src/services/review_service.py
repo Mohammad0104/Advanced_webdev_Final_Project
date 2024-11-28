@@ -4,7 +4,7 @@ from datetime import datetime
 def add_review(reviewer_id, product_id, rating, explanation):
     # Create a new instance of the Review model with the provided data
     new_review = Review(
-        reviewer_id=reviewer_id,  # ID of the user writing the review
+        reviewer_id=reviewer_id,  # ID of thde user writing the review
         product_id=product_id,    # ID of the product being reviewed
         rating=rating,            # Numerical rating given to the product
         explanation=explanation,  # Textual explanation of the review
