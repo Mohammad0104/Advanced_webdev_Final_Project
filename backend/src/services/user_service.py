@@ -65,13 +65,15 @@ def update_name(user_id: int, new_name: str):
         try:
             user.name = new_name
             db.session.commit()
-            return jsonify(
-                {'message': f"User's name updated successfully to: {new_name}"}
-            ), 200
+            return jsonify({
+                'message': f"User's name updated successfully to: {new_name}"
+            }), 200
         except Exception as e:
             db.session.rollback()
-            return jsonify(
-                {'error': 'Error occurred while updating name in db.',
-                 'details': str(e)}
-            ), 500
-    return jsonify({'error': 'User with that ID not found. Name not updated.'}), 404
+            return jsonify({
+                'error': 'Error occurred while updating name in db.',
+                'details': str(e)
+            }), 500
+    return jsonify({
+        'error': 'User with that ID not found. Name not updated.'
+    }), 404
