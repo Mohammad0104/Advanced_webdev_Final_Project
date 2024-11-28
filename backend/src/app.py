@@ -12,54 +12,42 @@ from controllers.cart_item_controller import cart_item_bp
 from controllers.payment_controller import payment_bp
 from flask_migrate import Migrate
 from flask_cors import CORS
-# from flask_talisman import Talisman
 
 def create_app():
-  app = Flask(__name__)
-  app.config.from_object(Config)
-  
-  # CORS(app, resources={r"/*": {"origins": "*"}})
-  CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
-
-  
-  # CORS(app, supports_credentials=True, origins=['http://localhost:3000'], debug=True)
-  # CORS(oauth_bp)
-  # CORS(product_bp)
-  # CORS(user_blueprint)
-  # CORS(review_blueprint)
-  # CORS(order_bp)
-  # CORS(cart_bp)
-  # CORS(cart_item_bp)
-  
-  # Talisman(app, force_https=True)
-  
-  # Initialize extensions
-  db.init_app(app)
-  migrate = Migrate(app, db)
-  
-  app.secret_key = Config.SECRET_KEY
-  
-  # Register blueprints
-  app.register_blueprint(oauth_bp)
-  app.register_blueprint(product_bp)
-  app.register_blueprint(user_blueprint)
-  app.register_blueprint(review_blueprint)
-  app.register_blueprint(order_bp)
-  app.register_blueprint(cart_bp)
-  app.register_blueprint(cart_item_bp)
-  app.register_blueprint(payment_bp)
-
-  
-  with app.app_context():
-    if not app.config.get('TESTING', False):
-      db.create_all()
+    app = Flask(__name__)
+    app.config.from_object(Config)
     
-  return app
+    # Update CORS to accept requests from the frontend container
+    CORS(app, resources={r"/*": {
+        "origins": ["http://localhost:3000", "http://frontend:3000"],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    }})
+    
+    # Initialize extensions
+    db.init_app(app)
+    migrate = Migrate(app, db)
+    
+    app.secret_key = Config.SECRET_KEY
+    
+    # Register blueprints
+    app.register_blueprint(oauth_bp)
+    app.register_blueprint(product_bp)
+    app.register_blueprint(user_blueprint)
+    app.register_blueprint(review_blueprint)
+    app.register_blueprint(order_bp)
+    app.register_blueprint(cart_bp)
+    app.register_blueprint(cart_item_bp)
+    app.register_blueprint(payment_bp)
+
+    with app.app_context():
+        if not app.config.get('TESTING', False):
+            db.create_all()
+    
+    return app
 
 if __name__ == '__main__':
-  app = create_app()
-  os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-  os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1' # fixes issue where scope changes (happens with the optional google drive permission)
-  # app.run('localhost', 8080, debug=True)
-  app.run(host='0.0.0.0', port=8080, debug=True)
-  # app.run(debug=True)
+    app = create_app()
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
+    app.run(host='0.0.0.0', port=8080, debug=True)

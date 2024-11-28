@@ -2,28 +2,36 @@ version: '3.9'
 
 services:
   backend:
-    container_name: backend-container
+    container_name: backend
     build: ./backend
     ports:
       - "8080:8080"
     command: python src/app.py
     environment:
       - FLASK_ENV=development
+      - FLASK_APP=app.py
     networks:
       - app-network
+    volumes:
+      - ./backend:/app
 
   frontend:
+    container_name: frontend
     build:
       context: ./frontend
     ports:
       - "3000:3000"
-    command: sh -c "npm install && npm start"
+    command: npm start
     environment:
-      - REACT_APP_BACKEND_URL=http://backend-container:8080
+      - REACT_APP_BACKEND_URL=http://backend:8080
+      - WDS_SOCKET_PORT=0
     depends_on:
       - backend
     networks:
       - app-network
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
   
 networks:
   app-network:
