@@ -3,7 +3,6 @@ from flask import Flask
 from models import db
 from models.user import User
 from controllers.user_controller import user_blueprint
-from unittest.mock import patch, MagicMock
 
 
 @pytest.fixture
@@ -86,5 +85,3 @@ def test_get_user_by_email(client, sample_user):
     assert data['email'] == sample_user.email
     assert data['name'] == sample_user.name
     assert data['profile_pic_url'] == sample_user.profile_pic_url
-
-
