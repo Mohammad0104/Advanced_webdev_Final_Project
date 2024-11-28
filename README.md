@@ -30,3 +30,7 @@
 
 ## Database Diagram
 ![database diagram](assets/db_diagram.png)
+## Pytests
+![image](https://github.com/user-attachments/assets/cb9b8fc2-c2cd-40bf-a797-bdc85a470f5c)
+
+
