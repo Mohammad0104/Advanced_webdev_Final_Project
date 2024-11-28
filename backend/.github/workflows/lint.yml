@@ -1,0 +1,28 @@
+name: CI/CD Pipeline - Linting
+
+on:
+  push:
+      branches:
+        - main
+        - develop
+        - tests-cli
+  pull_request:
+      branches:
+        - main
+        - develop
+        - tests-cli
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
+      - name: Install Flake8
+        run: pip install flake8
+      - name: Run Flake8
+        run: flake8 user_controller.py user.py user_service.py test_user.py
