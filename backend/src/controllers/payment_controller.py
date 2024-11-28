@@ -29,7 +29,7 @@ def create_payment():
         stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
         
         payment_intent = stripe.PaymentIntent.create(
-            amount=1000,  # Adjust according to the price of "Premium"
+            amount=1000,
             currency='usd',
             metadata={'integration_check': 'accept_a_payment'},
         )
