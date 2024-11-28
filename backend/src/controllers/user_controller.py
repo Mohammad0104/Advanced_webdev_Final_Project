@@ -1,5 +1,8 @@
 from flask import Blueprint, jsonify
-from services.user_service import get_user_by_id, get_user_by_email
+from services.user_service import (
+    get_user_by_id, 
+    get_user_by_email
+)
 
 # Create a Flask Blueprint named 'user'. This modularizes the routes related to user operations.
 user_blueprint = Blueprint('user', __name__)
