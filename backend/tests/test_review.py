@@ -90,4 +90,4 @@ def test_delete_review(client):
     # Validate the response
     assert response.status_code == 200, f"Error: {response.get_json()}"
     data = response.get_json()
-    assert data['message'] == 'Review deleted successfully'
+    assert data['message'] == 'Review deletedsuccessfully'
