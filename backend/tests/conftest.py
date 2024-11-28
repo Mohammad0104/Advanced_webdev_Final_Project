@@ -2,7 +2,11 @@ import pytest
 import os
 import sys
 
-# Add the src directory to Python's module search path
+<<<<<<< Updated upstream
+# Add the src directory to Python's module search dpath
+=======
+
+>>>>>>> Stashed changes
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 
 from models import db

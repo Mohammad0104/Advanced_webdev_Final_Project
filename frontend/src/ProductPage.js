@@ -12,7 +12,7 @@ function ProductPage({ products, setProducts }) {
   const [product, setProduct] = useState({
     name: '',
     description: '',
-    price: '', // Manually input price as text
+    price: '', 
     gender: '',
     size: '',
     brand: '',

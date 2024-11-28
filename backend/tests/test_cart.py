@@ -5,7 +5,7 @@ from models import db
 from models.user import User
 from models.product import Product
 from models.cart import Cart
-from models.cart_item import CartItem  # Ensure to import CartItem
+from models.cart_item import CartItem 
 from controllers.cart_controller import cart_bp
 
 
@@ -88,7 +88,7 @@ def setup_database(app):
         db.session.add_all([product1, product2])
 
         # Create a cart for user1
-        cart = Cart(id=1, user_id=1, subtotal=100.0)  # Matches test expectation
+        cart = Cart(id=1, user_id=1, subtotal=100.0)  
         db.session.add(cart)
 
         # Add items to the cart
@@ -106,7 +106,7 @@ def test_get_cart(client, setup_database):
 
     data = response.get_json()
     assert data['user_id'] == 1
-    assert data['subtotal'] == 100.0  # Matches setup
+    assert data['subtotal'] == 100.0  
     assert len(data['items']) == 2
     assert data['items'][0]['product_id'] == 1
     assert data['items'][0]['quantity'] == 1
@@ -116,7 +116,7 @@ def test_get_cart(client, setup_database):
 
 def test_get_cart_not_found(client):
     """Test retrieving a cart for a non-existent user."""
-    response = client.get('/api/cart/999')  # Non-existent cart
+    response = client.get('/api/cart/999')  
     assert response.status_code == 404
     data = response.get_json()
     assert "Cart not found" in data['error']

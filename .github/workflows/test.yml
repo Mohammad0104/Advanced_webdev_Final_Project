@@ -1,15 +1,16 @@
 name: CI/CD Pipeline - Testing
+
 on:
   push:
-      branches:
-        - main
-        - develop
-        - tests-cli
+    branches:
+      - main
+      - develop
+      - tests-cli
   pull_request:
-      branches:
-        - main
-        - develop
-        - tests-cli
+    branches:
+      - main
+      - develop
+      - tests-cli
 
 jobs:
   test:
@@ -17,11 +18,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12.6'
+          python-version: '3.12.2'
+
+      - name: Install missing dependencies (distutils)
+        run: sudo apt-get update && sudo apt-get install -y python3-distutils
+
       - name: Install dependencies
         run: pip install -r requirements.txt
+
       - name: Run tests
         run: pytest

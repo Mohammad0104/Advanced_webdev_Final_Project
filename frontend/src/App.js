@@ -2,7 +2,7 @@
 import './App.css';
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import HomePage from './HomePage'; // Import the HomePage component
+import HomePage from './HomePage'; 
 import ProductPage from './ProductPage';
 import ProductListPage from './ProductListPage';
 import CartPage from './CartPage';
@@ -32,7 +32,7 @@ function App() {
         </header>
         <div className="App-content">
           <Routes>
-            <Route path="/" element={<HomePage />} /> {/* Add HomePage route */}
+            <Route path="/" element={<HomePage />} /> {}
             <Route path="/add-product" element={<ProductPage products={products} setProducts={setProducts} />} />
             <Route path="/products" element={<ProductListPage products={products} setCart={setCart} />} />
             <Route path="/cart" element={<CartPage cart={cart} />} />

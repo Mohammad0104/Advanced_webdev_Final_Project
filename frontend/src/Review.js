@@ -23,7 +23,7 @@ function Review() {
     if (isLoggedIn) {
       const userInfo = await get_user_info();
       console.log(userInfo);
-      setSellerId(userInfo.id); // Assign this to a product or something else
+      setSellerId(userInfo.id); 
     } else {
         console.log('User not logged in. Redirecting...');
         redirectTo(`/authorize?next=${FRONTEND_BASE_URL}${location.pathname}`);
@@ -186,7 +186,7 @@ function Review() {
                       size={30} // Size of the stars
                       color2={'gold'} // Color for filled stars (gold)
                       color1={'#333'} // Color for empty stars (light gray)
-                      half={true} // Allow half stars
+                      half={true} // Allow half starss
                       edit={false}
                     />
                   </div>
