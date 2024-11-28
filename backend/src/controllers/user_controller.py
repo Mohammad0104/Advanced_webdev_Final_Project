@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
 from services.user_service import get_user_by_id, get_user_by_email, create_user, update_name
 from models.user import User
 
@@ -6,7 +7,15 @@ from models.user import User
 user_blueprint = Blueprint('user', __name__)
 
 @user_blueprint.route('/users/<int:user_id>', methods=['GET'])
-def get_user(user_id):
+def get_user(user_id: int):
+    """Endpoint to get the user by id
+
+    Args:
+        user_id (int): the id of the user to get
+
+    Returns:
+        JSON: JSON message with the user or error message
+    """
     # Fetch a user by their ID
     user = get_user_by_id(user_id)
     if user:
@@ -16,53 +25,18 @@ def get_user(user_id):
         # If the user is not found, return an error message with a 404 NOT FOUND status
         return jsonify({'message': 'User not found'}), 404
 
-@user_blueprint.route('/users/register', methods=['POST'])
-def register_user():
-    # Extract data from the incoming request
-    data = request.get_json()
 
-    # Check if a user with the same email already exists
-    if get_user_by_email(data['email']):
-        return jsonify({'message': 'Email already exists'}), 409
-
-    try:
-        # Create user without the password field, since we don't handle passwords
-        new_user = create_user(
-            name=data['name'],
-            email=data['email'],
-            profile_pic_url=data.get('profile_pic_url', '')
-        )
-        # If successful, serialize the new user's data and return it with a 201 CREATED status
-        return jsonify(new_user.serialize()), 201
-    except Exception as e:
-        # If an error occurs, return an error message with a 500 INTERNAL SERVER ERROR status
-        return jsonify({'error': 'Failed to create user', 'details': str(e)}), 500
-
-@user_blueprint.route('/users/login', methods=['POST'])
-def login_user():
-    # Extract data from the incoming request
-    data = request.get_json()
-    
-    # Retrieve the user by email (no password check)
-    user = get_user_by_email(data['email'])
-    
-    if user:
-        # If user is found, return the user details
-        return jsonify({'message': 'Login successful', 'user': user.serialize()}), 200
-    else:
-        # If the login fails (no user found), return an invalid credentials message
-        return jsonify({'message': 'Invalid email'}), 401
-
-@user_blueprint.route('/users/<int:user_id>', methods=['PUT'])
-def update_user_name(user_id):
-    # Extract new name from the request data
-    data = request.get_json()
-    # Call the service to update the user's name
-    response = update_name(user_id, data['new_name'])
-    return response
 
 @user_blueprint.route('/users/email/<email>', methods=['GET'])
 def get_user_by_email_route(email):
+    """_summary_
+
+    Args:
+        email (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     # Fetch a user by their email
     user = get_user_by_email(email)
 

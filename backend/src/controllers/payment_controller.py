@@ -6,25 +6,32 @@ from flask import jsonify, Blueprint, request
 from dotenv import load_dotenv
 load_dotenv()
 
+
 payment_bp = Blueprint('payment_bp', __name__)
 
 @payment_bp.route('/create-payment-intent', methods=['POST'])
 @cross_origin()
 def create_payment():
+    """Create payment with external api (stripe)
+    
+    Initializes a PaymentIntent object with a fixed amount 
+    and currency (although the amount does not matter). The client secret 
+    returned by Stripe is sent back to the frontend for completing the 
+    payment process
+
+    Returns:
+        JSON: A JSON response containing the client secret if successful, 
+        or an error message with a 403 status code in case of failure
+    """
     data = request.json
     items = data.get('items', [])
     customer = data.get('customer', '')
 
     try:
-        # Log the loaded Stripe key to confirm it's being loaded
-        stripe_api_key = os.getenv("STRIPE_SECRET_KEY")
-        if not stripe_api_key:
-            return jsonify(error="Stripe API key not found"), 403
+        # get stripe api key from .env file
+        stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
         
-        print(f"Stripe API Key Loaded: {stripe_api_key}")  # For debugging purposes
-        
-        stripe.api_key = stripe_api_key
-        
+        # create PaymentIntent object
         payment_intent = stripe.PaymentIntent.create(
             amount=1000,
             currency='usd',
@@ -37,5 +44,4 @@ def create_payment():
         return jsonify({'clientSecret': payment_intent.client_secret})
 
     except Exception as e:
-        print(f"Error: {e}")  # Debugging exception
         return jsonify(error=str(e)), 403

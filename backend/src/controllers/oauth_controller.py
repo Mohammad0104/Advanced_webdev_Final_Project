@@ -12,11 +12,11 @@ from services import user_service
 oauth_bp = Blueprint('oauth_bp', __name__)
 oauth_service = OAuthService()
 
-@oauth_bp.route('/')
-@cross_origin()
-def index():
-    # options table (will be changed later.  For now the focus is on "Test the authentication flow directly")
-    return print_index_table()
+# @oauth_bp.route('/')
+# @cross_origin()
+# def index():
+#     # options table (will be changed later.  For now the focus is on "Test the authentication flow directly")
+#     return print_index_table()
 
 # log in page
 @oauth_bp.route('/authorize')
@@ -39,7 +39,7 @@ def oauth2callback():
     """Handles OAuth 2.0 callnack from the authorization server
 
     Returns:
-        Redirect to the user info page
+        Redirect to the original url that the user was on before the redirect to login
     """
     state = session['state']  # retrieve the state to verify
     authorization_response = request.url # get full callback URL
@@ -102,11 +102,6 @@ def user_info():
     Returns:
         JSON or Redirect: JSON response with user info or redirection to the authorization route if credentials are missing
     """
-    
-    # if credentials are not stored in the session, redirect to the authorization route
-    # if 'credentials' not in session:
-    #     return redirect('/authorize')
-
     try:
         # create credentials object from the session
         credentials = google.oauth2.credentials.Credentials(**session['credentials'])
@@ -126,14 +121,13 @@ def user_info():
 @oauth_bp.route('/logout', methods=['POST'])
 @cross_origin()
 def logout():
+    """Endpoint used to logout user
+
+    Returns:
+        redirect or JSON: Redirect back to the home page or JSON message if there's an error
+    """
     try:
-        # # Revoke the OAuth token if necessary (optional)
-        # oauth_service = OAuthService()
-        # oauth_service.revoke_token(session['credentials']['token'])
-        
-        # # Clear session data
-        # session.clear()
-        # Check if the 'credentials' are in the session
+        # if there are credentials in the session
         if 'credentials' in session:
             try:
                 # Revoke the token or perform any other necessary actions
@@ -141,8 +135,8 @@ def logout():
             except Exception as e:
                 print(f"Error during token revocation: {e}")
         
+        # redirect back to the home page
         return redirect('http://localhost:3000/')
-        # return redirect(url_for('oauth_bp.logout'))  # Redirect to the homepage or login page
     except Exception as e:
         print(f"Error logging out: {e}")
         return jsonify({"error": "Logout failed"}), 500
@@ -171,43 +165,50 @@ def revoke():
     )
 
     if revoke.status_code == 200:
-        return 'Credentials successfully revoked.<br><br>' + print_index_table()  # if successful
+        return 'Credentials successfully revoked.'
+        # return 'Credentials successfully revoked.<br><br>' + print_index_table()  # if successful
     else:
-        return 'An error occurred.<br><br>' + print_index_table() # if failed
+        return 'An error occurred.<br><br>'
+        # return 'An error occurred.<br><br>' + print_index_table() # if failed
 
-@oauth_bp.route('/clear')
-@cross_origin()
-def clear_credentials():
-    """Clear the credentials from the session
+# @oauth_bp.route('/clear')
+# @cross_origin()
+# def clear_credentials():
+#     """Clear the credentials from the session
 
-    Returns:
-        Message confirming that the credentials were removed from the session
-    """
+#     Returns:
+#         Message confirming that the credentials were removed from the session
+#     """
     
-    # clear all session data
-    session.clear()
+#     # clear all session data
+#     session.clear()
     
-    # return confirmation message
-    return 'Credentials have been cleared.<br><br>' + print_index_table()
+#     # return confirmation message
+#     return 'Credentials have been cleared.<br><br>' + print_index_table()
 
 
 @oauth_bp.route('/check_login_status', methods=['GET'])
 @cross_origin()
 def check_login():
+    """Endpoint used to check if there is a user logged in
+
+    Returns:
+        JSON: JSON message with a true for logged in or false
+    """
     is_logged_in = 'credentials' in session
     return jsonify({'logged_in': is_logged_in})
     #return session['credentials'] != None
 
-# to be changed later (from default google example)
-@cross_origin()
-def print_index_table():
-    return ('<table>'
-            '<tr><td><a href="/test">Test an API request</a></td>'
-            '<td>Submit an API request and see a formatted JSON response.</td></tr>'
-            '<tr><td><a href="/authorize">Test the auth flow directly</a></td>'
-            '<td>Go directly to the authorization flow.</td></tr>'
-            '<tr><td><a href="/revoke">Revoke current credentials</a></td>'
-            '<td>Revoke the access token associated with the current user session.</td></tr>'
-            '<tr><td><a href="/clear">Clear Flask session credentials</a></td>'
-            '<td>Clear the access token currently stored in the user session.</td></tr>'
-            '</table>')
+# # to be changed later (from default google example)
+# @cross_origin()
+# def print_index_table():
+#     return ('<table>'
+#             '<tr><td><a href="/test">Test an API request</a></td>'
+#             '<td>Submit an API request and see a formatted JSON response.</td></tr>'
+#             '<tr><td><a href="/authorize">Test the auth flow directly</a></td>'
+#             '<td>Go directly to the authorization flow.</td></tr>'
+#             '<tr><td><a href="/revoke">Revoke current credentials</a></td>'
+#             '<td>Revoke the access token associated with the current user session.</td></tr>'
+#             '<tr><td><a href="/clear">Clear Flask session credentials</a></td>'
+#             '<td>Clear the access token currently stored in the user session.</td></tr>'
+#             '</table>')
