@@ -6,7 +6,7 @@ class CartItemService:
 
     @staticmethod
     def add_item_to_cart(user_id, product_id, quantity=1):
-        # Step 1: Retrieve the user's cart (use CartService to get the cart)
+        # Step 1: Retrieve the user's cart (1use CartService to get the cart)
         cart = CartService.get_cart_by_user_id(user_id)
         if not cart:
             # If no cart exists for the user, create a new one
