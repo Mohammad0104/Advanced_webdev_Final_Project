@@ -1,8 +1,11 @@
-from flask import Blueprint, jsonify
-from services.user_service import get_user_by_id, get_user_by_email
+from flask import Blueprint, request, jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
+from services.user_service import get_user_by_id, get_user_by_email, create_user, update_name
+from models.user import User
 
 # Create a Flask Blueprint named 'user'. This modularizes the routes related to user operations.
 user_blueprint = Blueprint('user', __name__)
+
 
 @user_blueprint.route('/users/<int:user_id>', methods=['GET'])
 def get_user(user_id: int):
