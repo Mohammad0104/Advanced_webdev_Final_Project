@@ -32,5 +32,9 @@
 ![database diagram](assets/db_diagram.png)
 ## Pytests
 ![image](https://github.com/user-attachments/assets/cb9b8fc2-c2cd-40bf-a797-bdc85a470f5c)
+![image](https://github.com/user-attachments/assets/397b561c-915f-473d-8e98-92695f79c685)
+![image](https://github.com/user-attachments/assets/b91dde46-c64c-4e02-82ab-102e9afd9f7d)
+
+
 
 
