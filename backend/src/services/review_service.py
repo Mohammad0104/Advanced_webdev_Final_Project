@@ -34,7 +34,7 @@ def get_reviews_by_product(product_id):
                 'review_date': review.review_date.isoformat(),
                 'reviewer_name': review.reviewing_user.name,
                 'seller_id': review.reviewed_product.seller_id,
-                'seller_name': review.reviewing_user.name,
+                'seller_name': review.reviewed_product.seller.name,
                 'product_id': review.product_id,
                 'product_name': review.reviewed_product.name 
             }

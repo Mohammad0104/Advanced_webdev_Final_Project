@@ -28,7 +28,6 @@ function App() {
             <Link to="/products" className="App-link">View Products</Link>
             <Link to="/cart" className="App-link">View Cart</Link>
             <Link to="/profile" className="App-link">Profile</Link>
-            <Link to="/reviews/product/:productId" className="App-link">Reviews</Link>
           </nav>
         </header>
         <div className="App-content">

@@ -188,18 +188,6 @@ function ProductListPage({ setCart }) {
           </div>
         ))
       )}
-      <Link
-        to="/"
-        style={{
-          display: 'block',
-          marginTop: '20px',
-          textAlign: 'center',
-          textDecoration: 'none',
-          color: '#007bff',
-        }}
-      >
-        Back to Product Page
-      </Link>
     </div>
   );
 }

@@ -241,6 +241,7 @@ function ProductPage({ products, setProducts }) {
           <option value="Basketball">Basketball</option>
           <option value="Cricket">Cricket</option>
           <option value="Football">Football (American)</option>
+          <option value="Hockey">Hockey</option>
           <option value="Rowing">Rowing</option>
           <option value="Soccer">Soccer</option>
           <option value="Tennis">Tennis</option>

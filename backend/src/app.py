@@ -60,5 +60,6 @@ if __name__ == '__main__':
   app = create_app()
   os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
   os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1' # fixes issue where scope changes (happens with the optional google drive permission)
-  app.run('localhost', 8080, debug=True)
+  # app.run('localhost', 8080, debug=True)
+  app.run(host='0.0.0.0', port=8080, debug=True)
   # app.run(debug=True)
