@@ -24,8 +24,8 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install missing dependencies (distutils)
-        run: sudo apt-get update && sudo apt-get install
+      - name: Upgrade pip, setuptools, and wheel
+        run: pip install --upgrade pip setuptools wheel
 
       - name: Install dependencies
         run: pip install -r requirements.txt
