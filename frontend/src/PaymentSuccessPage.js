@@ -49,9 +49,9 @@ export default function PaymentSuccessPage() {
       }
       createOrder();
     };
-  }, [navigate, userData]); // Dependencies to ensure it runs only when `navigate` or `userId` changes
+  }, [navigate, userData]); 
 
-  // Function to navigate to the order page
+  
   const redirectToOrderPage = () => {
     if (userData) {
       navigate(`/orders/${userData.id}`);

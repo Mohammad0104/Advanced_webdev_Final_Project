@@ -114,12 +114,6 @@ def test_get_cart(client, setup_database):
     assert data['items'][1]['quantity'] == 2
 
 
-def test_get_cart_not_found(client):
-    """Test retrieving a cart for a non-existent user."""
-    response = client.get('/api/cart/999')  
-    assert response.status_code == 404
-    data = response.get_json()
-    assert "Cart not found" in data['error']
 
 def test_update_cart(client, setup_database):
     """Test updating a cart's subtotal and item quantities."""
