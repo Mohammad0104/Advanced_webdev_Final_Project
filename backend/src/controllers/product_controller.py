@@ -13,6 +13,17 @@ product_bp = Blueprint('product_bp', __name__)
 @product_bp.route('/create_product', methods=['POST'])
 @cross_origin()
 def create_new_product():
+    """Endpoint to create a new product
+
+    Allows users (sellers) to add a new product to the catalog. 
+    It decodes the provided base64 image, validates the required details, 
+    and creates the product using the product service.
+
+    Returns:
+        JSON: A response containing a success message and the created product 
+        details with the image re-encoded in base64 if successful, or an error 
+        message status code if failed.
+    """
     try:
         data = request.get_json()
         seller_id = data.get('seller_id')
@@ -68,6 +79,11 @@ def create_new_product():
 @product_bp.route('/products', methods=['GET'])
 @cross_origin()
 def get_products():
+    """Endpoint for getting all the products from the db
+
+    Returns:
+        JSON: JSON message with a list of the products
+    """
     try:
         products = product_service.get_all_products()
 
@@ -89,6 +105,14 @@ def get_products():
 @product_bp.route('/product/<int:product_id>', methods=['GET'])
 @cross_origin()
 def get_product(product_id):
+    """Endpoint to get a product by it's id
+
+    Args:
+        product_id (int): The id of the product to get
+
+    Returns:
+        JSON: JSON message with the product
+    """
     try:
         product = product_service.get_product_by_id(product_id)
 
@@ -110,6 +134,14 @@ def get_product(product_id):
 @product_bp.route('/product/<int:product_id>', methods=['PUT'])
 @cross_origin()
 def update_product(product_id):
+    """Endpoint to update a specific product
+
+    Args:
+        product_id (int): the id of the product to update
+
+    Returns:
+        JSON: JSON message with the updated product
+    """
     try:
         data = request.get_json()
         product = product_service.get_product_by_id(product_id)

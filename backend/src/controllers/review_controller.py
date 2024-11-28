@@ -6,9 +6,10 @@ review_blueprint = Blueprint('review', __name__)
 
 @review_blueprint.route('/create_review', methods=['POST'])
 def create_review():
-    """
-    Route to create a new review for a product.
-    Expects JSON payload with reviewer_id, product_id, rating, and explanation.
+    """Endpoint to create a new review
+
+    Returns:
+        JSON: JSON message with the review id or error message
     """
     data = request.get_json()
     
@@ -38,9 +39,14 @@ def create_review():
 
 
 @review_blueprint.route('/reviews/product/<int:product_id>', methods=['GET'])
-def retrieve_reviews(product_id):
-    """
-    Route to retrieve all reviews for a specific product.
+def retrieve_reviews(product_id: int):
+    """Endpoint to get all the reviews for a given product
+
+    Args:
+        product_id (int): the id of the product to get all the reviews for
+
+    Returns:
+        JSON: JSON message with a list of reviews or error message
     """
     try:
         # Fetch reviews from the service
@@ -51,26 +57,20 @@ def retrieve_reviews(product_id):
         if not reviews:
             return jsonify({'reviews': [], 'message': 'No reviews yet for this product'}), 200
         
-
-        # Format reviews into JSON response
-        # reviews_data = [
-        #     {
-        #         'id': r.id,
-        #         'rating': r.rating,
-        #         'explanation': r.explanation,
-        #         'review_date': r.review_date.isoformat()
-        #     }
-        #     for r in reviews
-        # ]
         return jsonify({'reviews': reviews}), 200
     except Exception as e:
         return jsonify({'error': f'Failed to retrieve reviews: {str(e)}'}), 500
 
 
 @review_blueprint.route('/reviews/<int:review_id>', methods=['DELETE'])
-def remove_review(review_id):
-    """
-    Route to delete a review by its ID.
+def remove_review(review_id: int):
+    """Endpoint to delete a review
+
+    Args:
+        review_id (int): the id of the review to delete
+
+    Returns:
+        JSON: JSON success or failure message
     """
     try:
         # Attempt to delete the review

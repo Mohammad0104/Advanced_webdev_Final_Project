@@ -6,7 +6,7 @@ from models.cart import Cart
 cart_item_bp = Blueprint('cart_item', __name__)
 
 @cart_item_bp.route('/cart/<int:user_id>/add', methods=['POST'])
-def add_to_cart(user_id):
+def add_to_cart(user_id: int):
     """
     Endpoint to add a product to the user's cart.
     
@@ -39,7 +39,7 @@ def add_to_cart(user_id):
     }), 201
 
 @cart_item_bp.route('/cart/<int:cart_id>/remove', methods=['DELETE'])
-def remove_from_cart(cart_id):
+def remove_from_cart(cart_id: int):
     """
     Endpoint to remove a product from the cart by cart item ID.
     
