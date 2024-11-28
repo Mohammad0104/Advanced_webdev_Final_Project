@@ -1,15 +1,18 @@
 name: CI/CD Pipeline - Testing
+
 on:
   push:
       branches:
         - main
         - develop
         - tests-cli
+        - github-workflow  # Added github-workflow branch
   pull_request:
       branches:
         - main
         - develop
         - tests-cli
+        - github-workflow  # Added github-workflow branch
 
 jobs:
   test:
