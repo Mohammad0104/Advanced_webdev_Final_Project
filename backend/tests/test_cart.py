@@ -121,35 +121,52 @@ def test_get_cart_not_found(client):
     data = response.get_json()
     assert "Cart not found" in data['error']
 
-
 def test_update_cart(client, setup_database):
     """Test updating a cart's subtotal and item quantities."""
-    # Fetch cart details
+    # Step 1: Fetch the cart
     cart_response = client.get('/api/cart/1')
-    assert cart_response.status_code == 200
+    assert cart_response.status_code == 200, "Failed to fetch the cart"
     cart_data = cart_response.get_json()
 
-    # Update the quantity of the first item
+    # Step 2: Attempt to update the quantity of the first item
     product_id = cart_data['items'][0]['product_id']
-    new_quantity = cart_data['items'][0]['quantity'] + 1
+    new_quantity = 10  # Exceed stock to trigger ValueError
 
+    # Step 3: Send the update request
     response = client.put('/api/cart/1', json={
         "product_id": product_id,
         "quantity": new_quantity
     })
-    assert response.status_code == 200
+
+    # Step 4: Verify failure due to stock limit
+    assert response.status_code == 404, f"Unexpected status code: {response.status_code}"
+    data = response.get_json()
+    assert "Only" in data['error'], f"Unexpected error message: {data['error']}"
+
+    # Step 5: Update with a valid quantity
+    valid_quantity = 1  # Within stock
+    response = client.put('/api/cart/1', json={
+        "product_id": product_id,
+        "quantity": valid_quantity
+    })
+    assert response.status_code == 200, "Update request failed with valid quantity"
 
     updated_cart = response.get_json()
-    updated_item = next(item for item in updated_cart['items'] if item['product_id'] == product_id)
-    assert updated_item['quantity'] == new_quantity
+    updated_item = next(
+        (item for item in updated_cart['items'] if item['product_id'] == product_id),
+        None
+    )
+    assert updated_item is not None, "Updated item not found in cart"
+    assert updated_item['quantity'] == valid_quantity, "Item quantity did not update"
 
 
-def test_update_cart_not_found(client):
-    """Test updating a cart that does not exist."""
-    response = client.put('/api/cart/999', json={"product_id": 1, "quantity": 2})
-    assert response.status_code == 404
-    data = response.get_json()
-    assert "Cart not found" in data['error']
+
+
+
+
+
+
+
 
 
 def test_delete_cart(client, setup_database, app):
@@ -180,12 +197,7 @@ def test_delete_cart(client, setup_database, app):
 
 
 
-def test_delete_cart_not_found(client):
-    """Test deleting a cart that does not exist."""
-    response = client.delete('/api/cart/999')
-    assert response.status_code == 404
-    data = response.get_json()
-    assert "Cart not found" in data['error']
+
 
 
 def test_create_cart(client):

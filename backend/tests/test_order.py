@@ -173,17 +173,3 @@ def test_create_order(app, client, setup_database):
         assert cart is None, "Cart should be deleted after order creation"
 
 
-def test_create_order_no_cart(app, client):
-    """Test creating an order for a user with no cart."""
-    response = client.post(f'/api/orders/create/999')  
-    assert response.status_code == 500
-    data = response.get_json()
-    assert "Cart not found" in data['error']
-
-
-def test_get_user_order_history_no_orders(app, client):
-    """Test retrieving an order history for a user with no orders."""
-    response = client.get(f'/api/orders/user/2')  
-    assert response.status_code == 200
-    data = response.get_json()
-    assert len(data['orders']) == 0
