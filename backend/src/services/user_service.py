@@ -3,93 +3,75 @@ from config.admin_list import admin_users
 from flask import jsonify
 
 
-def get_user_by_id(id: int):
-    """Get a user by id.
+def get_user_by_id(user_id: int):
+    """Get a user by ID.
 
     Args:
-        id (int): id of the user.
+        user_id (int): ID of the user.
 
     Returns:
-        User or None: the user if there is one for the given id. If not, returns None.
+        User or None: The user object if found, otherwise None.
     """
-    user = User.query.filter_by(id=id).first()
-    return user
+    return User.query.filter_by(id=user_id).first()
 
 
 def get_user_by_email(email: str):
     """Get a user by email.
 
     Args:
-        email (str): email of the user.
+        email (str): Email of the user.
 
     Returns:
-        User or None: the user if there is one for the given email. If not, returns None.
+        User or None: The user object if found, otherwise None.
     """
-    user = User.query.filter_by(email=email).first()
-    return user
+    return User.query.filter_by(email=email).first()
 
 
 def create_user(name: str, email: str, profile_pic_url: str) -> User:
-    """Creates and adds a new user to the db.
+    """Creates and adds a new user to the database.
 
     Args:
-        name (str): name of the user.
-        email (str): email of the user.
-        profile_pic_url (str): profile picture url of the user.
+        name (str): Name of the user.
+        email (str): Email of the user.
+        profile_pic_url (str): Profile picture URL of the user.
 
     Returns:
-        User: the new user.
+        User: The newly created user object.
     """
-    # See if the email is part of the admin_users list
     is_admin = email in admin_users
-
-    # Create new User object
     user = User(
         name=name,
         email=email,
         profile_pic_url=profile_pic_url,
-        admin=is_admin,
+        admin=is_admin
     )
-
-    # Add user to the db
     db.session.add(user)
     db.session.commit()
-
     return user
 
 
-def update_name(id: int, new_name: str):
+def update_name(user_id: int, new_name: str):
     """Update the name of an existing user.
 
     Args:
-        id (int): id of the user to update.
-        new_name (str): the new name for the user.
+        user_id (int): ID of the user to update.
+        new_name (str): The new name for the user.
 
     Returns:
         JSON: JSON message about success or failure.
     """
-    user = User.query.get(id)
-
-    # If user is found with the given id
+    user = User.query.get(user_id)
     if user:
         try:
             user.name = new_name
             db.session.commit()
-            return (
-                jsonify({'message': f"User's name updated successfully to: {new_name}"}),
-                200,
-            )
-        # If there is a database error
+            return jsonify(
+                {'message': f"User's name updated successfully to: {new_name}"}
+            ), 200
         except Exception as e:
             db.session.rollback()
             return jsonify(
-                {
-                    'error': 'Error occurred while updating name in db.',
-                    'details': str(e),
-                }
+                {'error': 'Error occurred while updating name in db.',
+                 'details': str(e)}
             ), 500
-    # If there is no user with the given id
-    else:
-        return jsonify(
-            {'error': 'User with that id not found. Name not updated.'}
-        ), 404
+    return jsonify({'error': 'User with that ID not found. Name not updated.'}), 404
