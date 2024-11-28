@@ -5,12 +5,12 @@ on:
     branches:
       - main
       - develop
-      - tests-cli
+      - CLI
   pull_request:
     branches:
       - main
       - develop
-      - tests-cli
+      - CLI
 
 jobs:
   test:
