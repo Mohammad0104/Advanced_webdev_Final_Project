@@ -76,12 +76,12 @@ function Review() {
         const createdReview = {
           id: data.id, // From the backend response
           explanation: reviewText, // Local review text
-          rating: rating, // Local rating
+          rating: rating, 
           product_id: productId,
-          reviewer_id: sellerId, // This can be dynamic if you have user authentication
+          reviewer_id: sellerId, 
         };
 
-        setReviews([...reviews, createdReview]); // Add the new review to the list
+        setReviews([...reviews, createdReview]); 
         alert('Review created successfully!');
         setReviewText(''); // Clear input fields
         setRating(0);
