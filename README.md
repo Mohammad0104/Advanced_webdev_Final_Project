@@ -77,7 +77,14 @@
 ![image](https://github.com/user-attachments/assets/b91dde46-c64c-4e02-82ab-102e9afd9f7d)
 
 CLI TEST
-![image](https://github.com/user-attachments/assets/ec7efa6a-bc3c-451b-89f7-367a52b3912c)
+-lint.yaml
+![image](https://github.com/user-attachments/assets/7abde393-7166-45f9-a3ef-ee49dc71f941)
+-test.yaml
+![image](https://github.com/user-attachments/assets/50bf2025-266d-4a38-acf8-d16bb1d33a86)
+-CodeQL Analysis 
+![image](https://github.com/user-attachments/assets/00faa6bd-9908-4bab-9248-d130447c079e)
+-Dependabot Updates 
+![image](https://github.com/user-attachments/assets/bf0a36e9-4c2e-4238-b15b-fe050883d548)
 ## UML
 ![image](https://github.com/user-attachments/assets/3ac21907-86d4-4761-8f2e-dbf2b35e012e)
 
