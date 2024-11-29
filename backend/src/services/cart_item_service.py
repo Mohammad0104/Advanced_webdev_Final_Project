@@ -48,22 +48,6 @@ class CartItemService:
 
         return None  # If the cart item is not found
             
-    # @staticmethod
-    # def update_item_and_cart(cart, item_id, new_quantity):
-        
-    #     cart_item = next((item for item in cart.items if item.id == item_id), None)
-    #     if not cart_item:
-    #         raise ValueError(f"Cart item with ID {item_id} not found.")
-        
-    #     # Update the quantity of the cart item
-    #     cart_item.quantity = new_quantity
-        
-    #     # Recalculate the subtotal by summing up the product of quantity and price for each item
-    #     cart.subtotal = sum(item.quantity * item.product.price for item in cart.items)
-
-    #     # Commit the changes to the database
-    #     db.session.add(cart)
-    #     db.session.commit()
     @staticmethod
     def update_item_and_cart(cart, item_id, new_quantity):
         # Find the cart item
