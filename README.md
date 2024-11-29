@@ -76,6 +76,12 @@
 ![image](https://github.com/user-attachments/assets/397b561c-915f-473d-8e98-92695f79c685)
 ![image](https://github.com/user-attachments/assets/b91dde46-c64c-4e02-82ab-102e9afd9f7d)
 
+CLI TEST
+![image](https://github.com/user-attachments/assets/ec7efa6a-bc3c-451b-89f7-367a52b3912c)
+## UML
+![image](https://github.com/user-attachments/assets/3ac21907-86d4-4761-8f2e-dbf2b35e012e)
+
+
 
 
 
