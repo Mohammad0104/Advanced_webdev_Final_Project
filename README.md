@@ -90,8 +90,16 @@ CLI TEST
 ![Untitled Diagram](https://github.com/user-attachments/assets/77405d1f-9fd8-4d2e-9bc4-a9f879eb0af9)
 - **Product**
 ![Product](https://github.com/user-attachments/assets/aa2d09f9-5ac8-4c24-9807-353d0410d434)
+- **review**
+![Untitled Diagram(1)](https://github.com/user-attachments/assets/06637014-7e66-483c-8845-4c7d923d5277)
+- **order**
+![Untitled Diagram(2)](https://github.com/user-attachments/assets/6805b39d-cee4-4d6f-861b-0ee839380ea0)
+- **cart**
+![Untitled Diagram(3)](https://github.com/user-attachments/assets/d9633348-ff00-4726-a9ee-f26fe1a2d691)
+- **cart_item**
 
-- **Product**
+
+
 
 
 
