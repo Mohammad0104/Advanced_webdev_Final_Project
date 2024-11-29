@@ -88,6 +88,7 @@ CLI TEST
 ## UML
 - **User**
 ![image](https://github.com/user-attachments/assets/3ac21907-86d4-4761-8f2e-dbf2b35e012e)
+
 - **Product**
 ![image](https://github.com/user-attachments/assets/c9f3f068-7f54-46eb-b38b-4a067933a825)
 
