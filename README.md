@@ -98,7 +98,8 @@ CLI TEST
 ![Untitled Diagram(3)](https://github.com/user-attachments/assets/d9633348-ff00-4726-a9ee-f26fe1a2d691)
 - **cart_item**
 ![Untitled Diagram(4)](https://github.com/user-attachments/assets/63b943fa-ec77-4bfc-9e30-74be2c03e4a8)
-
+- **Finally**
+![Untitled Diagram(5)](https://github.com/user-attachments/assets/ed79483d-3319-4468-9ce5-dc4433320fa9)
 
 
 
