@@ -86,20 +86,8 @@ CLI TEST
 - **Dependabot Updates**
 ![image](https://github.com/user-attachments/assets/bf0a36e9-4c2e-4238-b15b-fe050883d548)
 ## UML
-- **User**
-![Untitled Diagram](https://github.com/user-attachments/assets/77405d1f-9fd8-4d2e-9bc4-a9f879eb0af9)
-- **Product**
-![Product](https://github.com/user-attachments/assets/aa2d09f9-5ac8-4c24-9807-353d0410d434)
-- **review**
-![Untitled Diagram(1)](https://github.com/user-attachments/assets/06637014-7e66-483c-8845-4c7d923d5277)
-- **order**
-![Untitled Diagram(2)](https://github.com/user-attachments/assets/6805b39d-cee4-4d6f-861b-0ee839380ea0)
-- **cart**
-![Untitled Diagram(3)](https://github.com/user-attachments/assets/d9633348-ff00-4726-a9ee-f26fe1a2d691)
-- **cart_item**
-![Untitled Diagram(4)](https://github.com/user-attachments/assets/63b943fa-ec77-4bfc-9e30-74be2c03e4a8)
-- **Finally**
-![Untitled Diagram(7)](https://github.com/user-attachments/assets/00a7ae64-aad7-4cb7-9592-b41c6ffe1de8)
+![Untitled Diagram(9)](https://github.com/user-attachments/assets/f7cf41ba-8823-4a31-be19-d2c381c24b61)
+
 
 
 
