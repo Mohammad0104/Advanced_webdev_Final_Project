@@ -1,0 +1,19 @@
+name: sports-marketplace
+services:
+  - name: backend
+    dockerfile_path: backend/Dockerfile
+    source_dir: backend
+    github:
+      branch: main
+    http_port: 8080
+    instance_count: 1
+    instance_size_slug: basic-xxs
+
+  - name: frontend
+    dockerfile_path: frontend/Dockerfile
+    source_dir: frontend
+    github:
+      branch: main
+    http_port: 3000
+    instance_count: 1
+    instance_size_slug: basic-xxs
