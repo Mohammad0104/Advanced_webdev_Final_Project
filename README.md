@@ -3,7 +3,7 @@
 
 ## Group Information
 - **Anthony Liscio (100787902)**
-- **Mohammad (100755461)**
+- **.Mohammad (100755461)**
 
 
 ## Run Instructions:
