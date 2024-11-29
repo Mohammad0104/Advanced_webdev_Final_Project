@@ -86,7 +86,8 @@ CLI TEST
 - **Dependabot Updates**
 ![image](https://github.com/user-attachments/assets/bf0a36e9-4c2e-4238-b15b-fe050883d548)
 ## UML
-![Untitled Diagram(9)](https://github.com/user-attachments/assets/f7cf41ba-8823-4a31-be19-d2c381c24b61)
+![Uml](https://github.com/user-attachments/assets/91c44a10-0e18-482b-9c72-261a438395b6)
+
 
 
 
