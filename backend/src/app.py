@@ -13,24 +13,26 @@ from controllers.payment_controller import payment_bp
 from flask_migrate import Migrate
 from flask_cors import CORS
 
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     
-    # Update CORS to accept requests from the frontend container
+    # CORS to accept requests from the frontend container
     CORS(app, resources={r"/*": {
         "origins": ["http://localhost:3000", "http://frontend:3000"],
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"]
     }})
     
-    # Initialize extensions
+    # initialize extensions
     db.init_app(app)
     migrate = Migrate(app, db)
     
+    # app secret key
     app.secret_key = Config.SECRET_KEY
     
-    # Register blueprints
+    # register blueprints
     app.register_blueprint(oauth_bp)
     app.register_blueprint(product_bp)
     app.register_blueprint(user_blueprint)
@@ -45,6 +47,7 @@ def create_app():
             db.create_all()
     
     return app
+
 
 if __name__ == '__main__':
     app = create_app()

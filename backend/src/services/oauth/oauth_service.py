@@ -5,6 +5,7 @@ import googleapiclient.discovery
 import requests
 from .config import Config
 
+
 class OAuthService:
     base_dir = os.path.dirname(os.path.abspath(__file__))  # directory of the current file
     CLIENT_SECRETS_FILE = os.path.join(base_dir, 'client_secret.json')  # full path to client_secret.json
@@ -19,9 +20,11 @@ class OAuthService:
     API_SERVICE_NAME = 'drive'
     API_VERSION = 'v2'
 
+
     def __init__(self):
         """Initialize the Google OAuth 2.0 authentication flow object"""
         self.flow = None
+
 
     def create_flow(self):
         """Creates the Google OAuth 2.0 authentication flow object using the
@@ -36,6 +39,7 @@ class OAuthService:
         except Exception as e:
             print("Error creating OAuth flow:", str(e))
 
+
     def get_redirect_uri(self):
         """To get the URI to be sent to after authorizing the app
 
@@ -43,6 +47,7 @@ class OAuthService:
             str: the URI
         """
         return 'http://localhost:8080/oauth2callback'
+    
     
     def has_drive_scope(credentials):
         """To check if the drive scope is still included
@@ -55,6 +60,7 @@ class OAuthService:
             is present. Otherwise, False is returned.
         """
         return 'https://www.googleapis.com/auth/drive.metadata.readonly' in credentials.scopes
+
 
     def get_authorization_url(self):
         """Generates authorization URL for OAuth 2.0."""
@@ -70,6 +76,7 @@ class OAuthService:
             print("Error generating authorization URL:", str(e))
             return None, None
     
+    
     def fetch_token(self, authorization_response):
         """Fetches the credentials after authentication."""
         try:
@@ -81,6 +88,7 @@ class OAuthService:
             print("Error fetching token:", str(e))
             return None
     
+    
     def get_drive_service(self, credentials):
         if not self.has_drive_scope(credentials):
             print("Google Drive scope not granted. Skipping Drive operations.")
@@ -90,8 +98,9 @@ class OAuthService:
             self.API_SERVICE_NAME, self.API_VERSION, credentials=credentials
         )
         
+        
     def get_user_info(self, access_token):
-        """Get the user's information
+        """Get the user's google account information
 
         Args:
             access_token (str): OAuth 2.0 access token
@@ -109,18 +118,31 @@ class OAuthService:
             print("Failed to fetch user info:", response.status_code, response.text)
             return None
     
+    
     def revoke_token(self, token):
+        """To revoke/remove credentials and user id from the session.
+        Used when logging out
+
+        Args:
+            token (str): The google oauth token to be revoked
+        """
+        
         revoke_url = f'https://oauth2.googleapis.com/revoke?token={token}'
+        
         try:
+            # POST request to revoke the URL
             response = requests.post(revoke_url)
+            
             session.pop('user_id', None)  # Remove user_id from session
             session.pop('credentials', None)  # Optionally, remove credentials if stored
+            
             if response.status_code == 200:
                 print("Token successfully revoked")
             else:
                 print("Failed to revoke token")
         except Exception as e:
             print(f"Error revoking token: {e}")
+
 
     @staticmethod
     def credentials_to_dict(credentials):

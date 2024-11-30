@@ -1,31 +1,62 @@
 from models.review import Review, db
 from datetime import datetime
 
+
 def add_review(reviewer_id, product_id, rating, explanation):
-    # Create a new instance of the Review model with the provided data
+    """Add a new review for a product.
+
+    Args:
+        reviewer_id (int): id of the user writing the review.
+        product_id (int): id of the product being reviewed.
+        rating (float): the rating given to the product (e.g., 1 to 5).
+        explanation (str): textual explanation of the review.
+
+    Returns:
+        Review: newly created review object.
+    """
+    # create a new instance of the Review model with the provided data
     new_review = Review(
-        reviewer_id=reviewer_id,  # ID of thde user writing the review
-        product_id=product_id,    # ID of the product being reviewed
-        rating=rating,            # Numerical rating given to the product
-        explanation=explanation,  # Textual explanation of the review
-        review_date=datetime.utcnow()  # Current time in UTC as the review date
+        reviewer_id=reviewer_id,
+        product_id=product_id,  
+        rating=rating,   
+        explanation=explanation,
+        review_date=datetime.utcnow()
     )
     
-    # Add the new review to the database session
+    # ddd the new review to the db and commit
     db.session.add(new_review)
-    # Commit the session to save the review to the database
     db.session.commit()
-    # Return the new review object
+    
+    # return the new review object
     return new_review
 
+
 def get_reviews_by_product(product_id):
-    # Retrieve all reviews from the database that match the specified product ID
-    # return Review.query.filter_by(product_id=product_id).all()
+    """ Retrieve all reviews for a given product, including associated user and seller details.
+
+    Args:
+        product_id (int): id of the product for which reviews are to be retrieved.
+
+    Returns:
+        list[dict]: a list of reviews, each represented as a dict containing:
+            - id (int): id of the review.
+            - rating (float): rating given in the review.
+            - explanation (str): textual explanation of the review.
+            - review_date (str): review date in ISO 8601 format.
+            - reviewer_name (str): name of the user who wrote the review.
+            - seller_id (int): id of the seller of the reviewed product.
+            - seller_name (str): name of the seller.
+            - product_id (int): id of the reviewed product.
+            - product_name (str): name of the reviewed product.
+
+    Raises:
+        Exception: if there is an error retrieving reviews from the database.
+    """
     try:
-        # Retrieve all reviews with product and seller information
+        # retrieve all reviews of the given product
         reviews = Review.query.filter_by(product_id=product_id).all()
         
-        # Format reviews data with product and seller info
+        # format reviews data with product and seller info
         reviews_data = [
             {
                 'id': review.id,
@@ -40,18 +71,27 @@ def get_reviews_by_product(product_id):
             }
             for review in reviews
         ]
+        # return the list
         return reviews_data
     except Exception as e:
         raise Exception(f"Error retrieving reviews: {str(e)}")
     
 
 def delete_review(review_id):
-    # Retrieve the review by its ID
+    """Delete a review from the database.
+
+    Args:
+        review_id (int): id of the review to be deleted.
+
+    Returns:
+        bool: True if the review was successfully deleted, otherwise False.
+    """
+    # retrieve the review by its ID
     review = Review.query.get(review_id)
+    
+    # if the review exists, delete it from the database and commit
     if review:
-        # If the review exists, delete it from the database
         db.session.delete(review)
-        # Commit the transaction to apply the deletion
         db.session.commit()
-        return True  # Return True to indicate successful deletion
-    return False  # Return False if no review was found to delete
+        return True
+    return False

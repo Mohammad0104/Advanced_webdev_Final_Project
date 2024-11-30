@@ -1,6 +1,9 @@
 from models.cart import Cart, db
 
+
 class CartService:
+    
+    
     @staticmethod
     def get_cart_by_user_id(user_id):
         """
@@ -14,6 +17,7 @@ class CartService:
         """
         return Cart.query.filter_by(user_id=user_id).first()
     
+    
     @staticmethod
     def create_cart(user_id, subtotal=0.0):
         """
@@ -26,10 +30,15 @@ class CartService:
         Returns:
             Cart: The newly created Cart object.
         """
+        # create new cart with the user_id and subtotal given
         cart = Cart(user_id=user_id, subtotal=subtotal)
+        
+        # add to the db
         db.session.add(cart)
         db.session.commit()
+        
         return cart
+
 
     @staticmethod
     def update_cart(cart_id, subtotal=None):
@@ -43,13 +52,17 @@ class CartService:
         Returns:
             Cart: The updated Cart object if successful, None otherwise.
         """
+        # get the cart by its id
         cart = Cart.query.get(cart_id)
+        
+        # if found update the subtotal, commit to db, and return updated cart
         if cart:
             if subtotal is not None:
                 cart.subtotal = subtotal
             db.session.commit()
             return cart
         return None
+    
     
     @staticmethod
     def delete_cart(cart_id):
@@ -62,7 +75,10 @@ class CartService:
         Returns:
             bool: True if the cart was deleted, False if not found.
         """
+        # get the cart by its id
         cart = Cart.query.get(cart_id)
+        
+        # if found delete the cart and return true
         if cart:
             db.session.delete(cart)
             db.session.commit()

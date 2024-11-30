@@ -5,20 +5,16 @@ from services.oauth.oauth_service import OAuthService
 import requests
 import google.oauth2.credentials
 
+
 # user service
 from services import user_service
+
 
 # oauth service
 oauth_bp = Blueprint('oauth_bp', __name__)
 oauth_service = OAuthService()
 
-# @oauth_bp.route('/')
-# @cross_origin()
-# def index():
-#     # options table (will be changed later.  For now the focus is on "Test the authentication flow directly")
-#     return print_index_table()
 
-# log in page
 @oauth_bp.route('/authorize')
 @cross_origin()
 def authorize():
@@ -32,6 +28,7 @@ def authorize():
     session['state'] = state  # Store state for verification
     
     return redirect(authorization_url)
+
 
 @oauth_bp.route('/oauth2callback')
 @cross_origin()
@@ -83,12 +80,7 @@ def oauth2callback():
 
     # Clear session data to prevent reuse
     session.pop('original_url', None)
-    # session.pop('state', None)
-    
-    
-    # redirect to the user_info endpoint
-    # return redirect('/user_info')
-    
+
     # redirect back to previous screen
     return redirect(original_url)
 
@@ -118,6 +110,7 @@ def user_info():
     # return user info as JSON
     return jsonify(user_info)
 
+
 @oauth_bp.route('/logout', methods=['POST'])
 @cross_origin()
 def logout():
@@ -140,6 +133,7 @@ def logout():
     except Exception as e:
         print(f"Error logging out: {e}")
         return jsonify({"error": "Logout failed"}), 500
+
 
 @oauth_bp.route('/revoke')
 @cross_origin()
@@ -166,25 +160,8 @@ def revoke():
 
     if revoke.status_code == 200:
         return 'Credentials successfully revoked.'
-        # return 'Credentials successfully revoked.<br><br>' + print_index_table()  # if successful
     else:
         return 'An error occurred.<br><br>'
-        # return 'An error occurred.<br><br>' + print_index_table() # if failed
-
-# @oauth_bp.route('/clear')
-# @cross_origin()
-# def clear_credentials():
-#     """Clear the credentials from the session
-
-#     Returns:
-#         Message confirming that the credentials were removed from the session
-#     """
-    
-#     # clear all session data
-#     session.clear()
-    
-#     # return confirmation message
-#     return 'Credentials have been cleared.<br><br>' + print_index_table()
 
 
 @oauth_bp.route('/check_login_status', methods=['GET'])
@@ -197,18 +174,3 @@ def check_login():
     """
     is_logged_in = 'credentials' in session
     return jsonify({'logged_in': is_logged_in})
-    #return session['credentials'] != None
-
-# # to be changed later (from default google example)
-# @cross_origin()
-# def print_index_table():
-#     return ('<table>'
-#             '<tr><td><a href="/test">Test an API request</a></td>'
-#             '<td>Submit an API request and see a formatted JSON response.</td></tr>'
-#             '<tr><td><a href="/authorize">Test the auth flow directly</a></td>'
-#             '<td>Go directly to the authorization flow.</td></tr>'
-#             '<tr><td><a href="/revoke">Revoke current credentials</a></td>'
-#             '<td>Revoke the access token associated with the current user session.</td></tr>'
-#             '<tr><td><a href="/clear">Clear Flask session credentials</a></td>'
-#             '<td>Clear the access token currently stored in the user session.</td></tr>'
-#             '</table>')

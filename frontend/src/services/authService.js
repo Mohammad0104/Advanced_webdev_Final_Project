@@ -1,5 +1,3 @@
-import { replace } from "react-router-dom";
-
 // Utility function that checks login status and handles navigation
 export async function checkLoginStatus(navigate) {
     try {
@@ -63,24 +61,3 @@ export async function get_user_info() {
         return null;
     }
 }
-
-// export async function get_user_info(email) {
-//     try {
-//         const route = 'http://localhost:8080/users/email/'+email;
-//         const response = await fetch(route, {
-//             method: 'GET',
-//             headers: {
-//               'Content-Type': 'application/json', // Optional, but useful if you expect JSON
-//             },
-//             credentials: 'include',
-//           });
-//         // const response2 = await fetch(route);
-//         const userDbData = await response.json();
-
-//         return userDbData;
-//       }
-//     catch (error) {
-//         console.error('Error fetching user db info: ', error);
-//         return null;
-//     }
-// }

@@ -4,8 +4,10 @@ from services.cart_item_service import CartItemService
 from models.cart import Cart, db
 from sqlalchemy.exc import SQLAlchemyError
 
-# Define a Blueprint for cart routes
+
+# blueprint for cart routes
 cart_bp = Blueprint('cart', __name__)
+
 
 @cart_bp.route('/cart/<int:user_id>', methods=['GET'])
 def get_cart(user_id):
@@ -32,6 +34,7 @@ def get_cart(user_id):
         } for item in cart.items]
         }), 200
     return jsonify({'error': 'Cart not found'}), 404
+
 
 @cart_bp.route('/cart', methods=['POST'])
 def create_cart():

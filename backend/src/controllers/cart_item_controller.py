@@ -2,8 +2,10 @@ from flask import Blueprint, request, jsonify
 from services.cart_item_service import CartItemService
 from models.cart import Cart
 
-# Define a Blueprint for cart item routes
+
+# blueprint for cart item routes
 cart_item_bp = Blueprint('cart_item', __name__)
+
 
 @cart_item_bp.route('/cart/<int:user_id>/add', methods=['POST'])
 def add_to_cart(user_id: int):
@@ -38,6 +40,7 @@ def add_to_cart(user_id: int):
         } for item in cart.items]
     }), 201
 
+
 @cart_item_bp.route('/cart/<int:cart_id>/remove', methods=['DELETE'])
 def remove_from_cart(cart_id: int):
     """
@@ -47,7 +50,8 @@ def remove_from_cart(cart_id: int):
         cart_id (int): ID of the cart.
     
     Request Body:
-        JSON object with 'cart_item_id'
+        JSON object:
+            - cart_item_id (int): The ID of the cart item to remove.
     
     Returns:
         JSON response: Success message if removed, otherwise error message.

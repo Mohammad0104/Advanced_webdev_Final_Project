@@ -4,10 +4,13 @@ from flask_cors import cross_origin
 import stripe
 from flask import jsonify, Blueprint, request
 from dotenv import load_dotenv
+
+
 load_dotenv()
 
 
 payment_bp = Blueprint('payment_bp', __name__)
+
 
 @payment_bp.route('/create-payment-intent', methods=['POST'])
 @cross_origin()

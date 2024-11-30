@@ -2,6 +2,7 @@ from models.user import User, db
 from config.admin_list import admin_users
 from flask import jsonify
 
+
 def get_user_by_id(id: int):
     """Get a user by id
 
@@ -14,6 +15,7 @@ def get_user_by_id(id: int):
     user = User.query.filter_by(id=id).first()    
     return user
 
+
 def get_user_by_email(email: str):
     """Get a user by email
 
@@ -25,6 +27,7 @@ def get_user_by_email(email: str):
     """
     user = User.query.filter_by(email=email).first()    
     return user
+
 
 def create_user(name: str, email: str, profile_pic_url: str) -> User:
     """Creates and adds a new user to the db
@@ -53,6 +56,7 @@ def create_user(name: str, email: str, profile_pic_url: str) -> User:
     db.session.commit()
     
     return user
+
 
 def update_name(id: int, new_name: str):
     """To update the name of an existing user

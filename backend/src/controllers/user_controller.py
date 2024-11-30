@@ -3,8 +3,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from services.user_service import get_user_by_id, get_user_by_email, create_user, update_name
 from models.user import User
 
-# Create a Flask Blueprint named 'user'. This modularizes the routes related to user operations.
+
+# blueprint for the routes related to user operations.
 user_blueprint = Blueprint('user', __name__)
+
 
 @user_blueprint.route('/users/<int:user_id>', methods=['GET'])
 def get_user(user_id: int):
@@ -24,7 +26,6 @@ def get_user(user_id: int):
     else:
         # If the user is not found, return an error message with a 404 NOT FOUND status
         return jsonify({'message': 'User not found'}), 404
-
 
 
 @user_blueprint.route('/users/email/<email>', methods=['GET'])

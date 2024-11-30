@@ -3,6 +3,7 @@ from flask import jsonify
 from typing import Optional
 from datetime import datetime
 
+
 def get_product_by_id(id: int) -> Optional[Product]:
     """
     Get a product by its ID.
@@ -15,6 +16,7 @@ def get_product_by_id(id: int) -> Optional[Product]:
     """
     return Product.query.filter_by(id=id).first()
 
+
 def get_all_products() -> list[Product]:
     """
     Retrieve all products from the database.
@@ -24,8 +26,8 @@ def get_all_products() -> list[Product]:
     """
     return Product.query.all()
 
-def create_product(
-    seller_id: int, 
+
+def create_product(seller_id: int, 
     name: str,
     description: str, 
     price: float, 
@@ -88,6 +90,7 @@ def create_product(
     db.session.commit()
     return new_product
 
+
 def update_product(
     product_id: int,
     name: Optional[str] = None,
@@ -142,6 +145,7 @@ def update_product(
 
     db.session.commit()
     return product
+
 
 def delete_product(product_id: int) -> str:
     """

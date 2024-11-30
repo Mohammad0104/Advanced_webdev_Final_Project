@@ -1,10 +1,11 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime
 from services import order_service
-
 from services.auth import login_required
 
+# blueprint
 order_bp = Blueprint('order_bp', __name__)
+
 
 @order_bp.route('/orders/user/<int:user_id>', methods=['GET'])
 def get_user_order_history(user_id: int):
@@ -28,6 +29,7 @@ def get_user_order_history(user_id: int):
         # Handle exceptions (e.g., database errors, user not found, etc.)
         return jsonify({"error": str(e)}), 500
 
+
 @order_bp.route('/orders/create/<int:user_id>', methods=['POST'])
 def create_order(user_id: int):
     """Endpoint to create a new order for the user
@@ -38,8 +40,6 @@ def create_order(user_id: int):
     Returns:
         JSON: JSON message with the new order or error message
     """
-    # print('hey')
-    # print(user_id)
     try:
         # Create an order for the given user
         new_order = order_service.create_order(user_id)

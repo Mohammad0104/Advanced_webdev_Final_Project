@@ -3,13 +3,12 @@ from datetime import datetime
 from services import product_service
 from flask_cors import cross_origin
 import base64
-
 from services.auth import login_required
+
 
 product_bp = Blueprint('product_bp', __name__)
 
 
-# Create a new product
 @product_bp.route('/create_product', methods=['POST'])
 @cross_origin()
 def create_new_product():

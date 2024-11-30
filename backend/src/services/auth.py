@@ -1,6 +1,7 @@
 from functools import wraps
 from flask import session, redirect, url_for, request
 
+
 def login_required(f):
     """To use on specific enpoints to restrict to only be used when logged in
 

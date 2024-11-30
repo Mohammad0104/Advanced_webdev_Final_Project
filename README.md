@@ -7,6 +7,14 @@
 
 
 ## Run Instructions:
+### To run with docker:
+- ensure that in `frontend/package.json` there is this line exactly: `"proxy": "http://backend:8080"` (this is important)
+- run docker desktop/engine
+- open terminal and make sure you are in the project root:
+  - run `docker-compose up --build` 
+  - This should take at least a few minutes.  Once it's done building and the backend and frontend run, go to http://localhost:3000
+  - Be sure to add a product, and then after that view/edit, add to cart, purchase, and check order history!
+
 ### To run locally:
 - Open 2 terminals (windows command line)
   - In 1 terminal:
@@ -28,13 +36,6 @@
     - `npm install`
     - `npm start`
     - once ready, go to http://localhost:3000
-
-### To run on docker container:
-- ensure that in `frontend/package.json` there is this line exactly: `"proxy": "http://backend:8080"` (this is important)
-- run docker desktop/engine
-- open terminal:
-  - run `docker-compose up --build` 
-  - This should take at least a few minutes.  Once it's done building and the backend and frontend run, go to http://localhost:3000
 
 ## Database
 - Used ORM with Flask-SQLAlchemy on sqlite database

@@ -1,8 +1,10 @@
 from flask import Blueprint, request, jsonify
 from services.review_service import add_review, get_reviews_by_product, delete_review
 
-# Create a Flask Blueprint named 'review' for review-related routes
+
+# blueprint for review-related routes
 review_blueprint = Blueprint('review', __name__)
+
 
 @review_blueprint.route('/create_review', methods=['POST'])
 def create_review():

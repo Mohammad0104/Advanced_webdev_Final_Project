@@ -7,11 +7,11 @@ __pycache__/
 # C extensions
 *.so
 
+
+
 # Virtual environment
 venv/
-.env/
 .venv/
-client_secret.json
 
 # Flask/Django stuff:
 instance/
@@ -21,9 +21,13 @@ instance/
 migrations/
 
 # Environment variables files
-.env
-.env.*
-*.env
+# allow env now
+# .env/
+# .env
+# .env.*
+# *.env
+# allow client_secret.json now
+# client_secret.json
 
 # Logs
 *.log

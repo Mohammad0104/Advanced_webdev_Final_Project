@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { checkLoginStatus, redirectTo, get_user_info } from './services/authService';
-import { redirect, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);  // User state to store logged-in user's info
