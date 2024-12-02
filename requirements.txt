@@ -35,7 +35,7 @@ iniconfig==2.0.0
 ipykernel==6.4.1
 ipython==7.28.0
 ipython-genutils==0.2.0
-ipywidgets==7.6.5
+ipywidgets==8.1.5
 itsdangerous==2.2.0
 jedi==0.18.0
 Jinja2==3.1.4
