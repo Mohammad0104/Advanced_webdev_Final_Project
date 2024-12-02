@@ -1,6 +1,6 @@
 Flask==2.2.2
 Flask-JWT-Extended==4.4.4
-Flask-SQLAlchemy==3.0.3
+Flask-SQLAlchemy==3.1.1
 flask-migrate
 SQLAlchemy==2.0.21
 Werkzeug==2.2.2
